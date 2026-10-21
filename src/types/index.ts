@@ -270,3 +270,35 @@ export interface PulseOverview {
   companyTrend: number[];
   departments: DepartmentPulse[];
 }
+
+export type DashboardPeriod = 7 | 30 | 90;
+export type DashboardMetricId = "happiness" | "burnout" | "customers" | "critical" | "onboarding" | "actions";
+export interface DashboardMetric {
+  id: DashboardMetricId;
+  value: number;
+  delta: number;
+  series: number[];
+}
+export interface DashboardObservation {
+  at: ISODate;
+  happiness: number;
+  burnout: number;
+  customers: number;
+  critical: number;
+  onboarding: number;
+  actions: number;
+}
+export type DashboardDepartment = { id: string; name: string; suppressed: true } | { id: string; name: string; suppressed: false; score: number; risk: RiskLevel };
+export interface DashboardAlert { id: string; title: string; source: ActionCard["source"]; severity: Severity; at: ISODate; actionId: string }
+export interface DashboardDate { id: string; title: string; kind: "baslangic" | "aksiyon" | "kvkk"; at: ISODate; actionId?: string; onboardingId?: string }
+export interface DashboardWidgets {
+  overview: { metrics: DashboardMetric[]; updatedAt: ISODate; critical: number; pending: number };
+  priorities: ActionCard[];
+  departments: DashboardDepartment[];
+  trend: { date: ISODate; employee: number | null; customer: number | null }[];
+  topics: { topic: VocTopic; count: number; sentiment: VocSentiment }[];
+  alerts: DashboardAlert[];
+  onboarding: OnboardingInvite[];
+  dates: DashboardDate[];
+}
+export interface DashboardTask { id: string; actionId: string; title: string; createdAt: ISODate }
