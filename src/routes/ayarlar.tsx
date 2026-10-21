@@ -1,29 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Settings } from "lucide-react";
-import { PageScaffold } from "@/components/common/PageScaffold";
-import { getSettings } from "@/services";
-
+import { SettingsPage } from "@/components/common/SettingsPage";
 export const Route = createFileRoute("/ayarlar")({
-  head: () => ({
-    meta: [
-      { title: "Ayarlar · [ÜRÜN ADI]" },
-      { name: "description", content: "Şirket, kullanıcı ve bildirim tercihleri." },
-      { property: "og:title", content: "Ayarlar · [ÜRÜN ADI]" },
-      { property: "og:description", content: "Şirket, kullanıcı ve bildirim tercihleri." },
-    ],
-  }),
+  head: () => ({ meta: [ { title: "Şirket Ayarları · [ÜRÜN ADI]" }, { name: "description", content: "Şirket profili, departmanlar, kullanıcılar ve uygulama tercihleri." }, { property: "og:title", content: "Şirket Ayarları · [ÜRÜN ADI]" }, { property: "og:description", content: "Şirket, gizlilik, bildirim ve görünüm tercihlerini yönet." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" } ] }),
   component: Page,
 });
-
-function Page() {
-  return (
-    <PageScaffold
-      title="Ayarlar"
-      description="Şirket, kullanıcı ve bildirim tercihleri."
-      icon={Settings}
-      queryKey={["settings"]}
-      queryFn={getSettings}
-      emptyTitle="Ayarlar yakında"
-    />
-  );
-}
+function Page() { return <SettingsPage />; }
