@@ -74,7 +74,7 @@ export const actionCards: ActionCard[] = [
 
 export const sentimentSeries: SentimentPoint[] = Array.from({ length: 8 }, (_, i) => ({
   date: `2026-0${(i % 9) + 1}-01`,
-  score: [0.21, 0.18, 0.25, 0.3, 0.22, 0.12, 0.28, 0.34][i],
+  score: [0.21, 0.18, 0.25, 0.3, 0.22, 0.12, 0.28, 0.34][i] ?? 0,
   responses: 40 + i * 3,
 }));
 
