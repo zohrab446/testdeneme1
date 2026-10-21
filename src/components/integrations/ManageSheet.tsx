@@ -20,7 +20,11 @@ export function ManageSheet({ source, onClose, onReconnect, onDisconnect }: {
   const [selected, setSelected] = useState(source.selectedChannels);
   const client = useQueryClient();
   const save = useMutation({ mutationFn: () => saveIntegrationSettings(source.id, frequency, selected),
-    onSuccess: () => { toast.success("Senkron ayarları kaydedildi."); void client.invalidateQueries({ queryKey: ["integration-catalog"] }); },
+    onSuccess: updated => {
+      client.setQueryData<IntegrationConnection[]>(["integration-catalog"], current => current?.map(item => item.id === updated.id ? updated : item));
+      toast.success("Senkron ayarları kaydedildi.");
+      void client.invalidateQueries({ queryKey: ["integration-catalog"] });
+    },
   });
   const status = integrationStatuses[source.status];
   return <Sheet open onOpenChange={open => { if (!open && !save.isPending) onClose(); }}>

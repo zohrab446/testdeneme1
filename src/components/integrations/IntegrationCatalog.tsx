@@ -58,7 +58,7 @@ export function IntegrationCatalog({ sources }: { sources: IntegrationConnection
               <h3 className="mt-4 font-semibold">{source.name}</h3><p className="mt-1 min-h-10 text-sm leading-relaxed text-muted-foreground">{source.description}</p>
               <p className="mt-4 text-xs text-muted-foreground">Son senkron: {source.lastSync ? formatDateTime(source.lastSync) : "—"}</p>
               {source.deleteAt && <p className="mt-2 text-xs text-muted-foreground">Silinme tarihi: {formatDate(source.deleteAt)} (örnek)</p>}
-              <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-4 mt-4">
+              <div className="mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
                 {source.status === "yakinda" ? <Button variant="outline" className="w-full" onClick={() => { setNotify(source); setEmail(source.notificationEmail ?? ""); notification.reset(); }}><Bell className="size-4" />{source.notificationEmail ? "Bildirim kaydı alındı" : "Haberdar et"}</Button> : <>
                   {!active && <Button variant="outline" className="flex-1" onClick={() => setConnecting(source)}><Link2 className="size-4" />Bağla</Button>}
                   {active && <><Button variant="outline" className="flex-1" onClick={() => setManagedId(source.id)}><Settings2 className="size-4" />Yönet</Button><Button variant="ghost" size="icon" title="Bağlantıyı Kes" aria-label={`${source.name} bağlantısını kes`} disabled={disconnect.isPending} onClick={() => setDisconnecting(source)}><Unplug className="size-4" /></Button></>}
