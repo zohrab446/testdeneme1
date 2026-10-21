@@ -29,30 +29,7 @@ export const getDepartments = (): Promise<Department[]> => mockResponse(db.depar
 
 export const getIntegrations = (): Promise<Integration[]> => mockResponse(db.integrations, []);
 
-export const getOnboardingInvites = (): Promise<OnboardingInvite[]> =>
-  mockResponse(db.onboardingInvites, []);
-
-export const getOnboardingInvite = (id: string): Promise<OnboardingInvite | null> =>
-  mockResponse(db.onboardingInvites.find((i) => i.id === id) ?? null, null);
-
-export const getInviteByToken = (token: string): Promise<OnboardingInvite | null> =>
-  mockResponse(db.onboardingInvites.find((i) => i.token === token) ?? null, null);
-
-export async function createEmployeeInvite(
-  input: CreateEmployeeInviteInput,
-): Promise<OnboardingInvite> {
-  await delay();
-  const invite: OnboardingInvite = {
-    ...input,
-    id: `o${Date.now()}`,
-    token: Math.random().toString(36).slice(2, 12),
-    status: "gonderildi",
-    progress: 0,
-    createdAt: new Date().toISOString(),
-  };
-  db.onboardingInvites.push(invite);
-  return invite;
-}
+export * from "./onboarding";
 
 export const getSettings = () =>
   mockResponse<Record<string, unknown> | null>({ language: "tr", currency: "TRY" }, null);
