@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useForm, type UseFormRegisterReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, History, Loader2, Pencil, Send, TriangleAlert } from "lucide-react";
@@ -78,11 +78,17 @@ function NativeSelect({
   a11y,
 }: {
   options: string[];
-  reg: UseFormRegisterReturn;
+  reg: { value: string; onChange: (v: string) => void; onBlur: () => void };
   a11y: Record<string, unknown>;
 }) {
   return (
-    <select {...a11y} {...reg} className={controlCls}>
+    <select
+      {...a11y}
+      value={reg.value}
+      onChange={(e) => reg.onChange(e.target.value)}
+      onBlur={reg.onBlur}
+      className={controlCls}
+    >
       <option value="">Seç</option>
       {options.map((o) => (
         <option key={o} value={o}>
@@ -243,6 +249,12 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
     "aria-required": name !== "military" ? true : undefined,
   });
 
+  const sel = (name: keyof WelcomeValues) => ({
+    value: (watch(name) as string | undefined) ?? "",
+    onChange: (val: string) => setValue(name, val, { shouldValidate: !!errors[name], shouldDirty: true }),
+    onBlur: () => void (errors[name] && trigger(name)),
+  });
+
   const phoneReg = (name: "phone" | "emergencyPhone") => {
     const r = register(name);
     return {
@@ -328,10 +340,10 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
               <Input className="h-11 text-base md:text-sm" {...field("fatherName")} {...register("fatherName")} />
             </F>
             <F name="maritalStatus" error={errors.maritalStatus?.message} label="Medeni hal">
-              <NativeSelect a11y={field("maritalStatus")} options={["Bekâr", "Evli", "Boşanmış", "Dul"]} reg={register("maritalStatus")} />
+              <NativeSelect a11y={field("maritalStatus")} options={["Bekâr", "Evli", "Boşanmış", "Dul"]} reg={sel("maritalStatus")} />
             </F>
             <F name="gender" error={errors.gender?.message} label="Cinsiyet">
-              <NativeSelect a11y={field("gender")} options={["Kadın", "Erkek", "Belirtmek istemiyorum"]} reg={register("gender")} />
+              <NativeSelect a11y={field("gender")} options={["Kadın", "Erkek", "Belirtmek istemiyorum"]} reg={sel("gender")} />
             </F>
           </div>
         )}
@@ -362,7 +374,7 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
         {step.id === "egitim" && (
           <div className="grid gap-4 sm:grid-cols-2">
             <F name="educationLevel" error={errors.educationLevel?.message} label="Öğrenim durumu">
-              <NativeSelect a11y={field("educationLevel")} options={["İlkokul", "Ortaokul", "Lise", "Ön lisans", "Lisans", "Yüksek lisans", "Doktora"]} reg={register("educationLevel")} />
+              <NativeSelect a11y={field("educationLevel")} options={["İlkokul", "Ortaokul", "Lise", "Ön lisans", "Lisans", "Yüksek lisans", "Doktora"]} reg={sel("educationLevel")} />
             </F>
             <F name="graduationYear" error={errors.graduationYear?.message} label="Mezuniyet yılı">
               <Input inputMode="numeric" maxLength={4} className="h-11 text-base md:text-sm" {...field("graduationYear")} {...register("graduationYear")} />
@@ -371,11 +383,11 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
               <Input className="h-11 text-base md:text-sm" {...field("school")} {...register("school")} />
             </F>
             <F name="previouslyInsured" error={errors.previouslyInsured?.message} label="Daha önce sigortalı (SGK) çalıştın mı?" className="sm:col-span-2">
-              <NativeSelect a11y={field("previouslyInsured")} options={["Evet", "Hayır"]} reg={register("previouslyInsured")} />
+              <NativeSelect a11y={field("previouslyInsured")} options={["Evet", "Hayır"]} reg={sel("previouslyInsured")} />
             </F>
             {gender === "Erkek" && (
               <F name="military" error={errors.military?.message} label="Askerlik durumu" className="sm:col-span-2">
-                <NativeSelect a11y={field("military")} options={["Yapıldı", "Tecilli", "Muaf"]} reg={register("military")} />
+                <NativeSelect a11y={field("military")} options={["Yapıldı", "Tecilli", "Muaf"]} reg={sel("military")} />
               </F>
             )}
           </div>
