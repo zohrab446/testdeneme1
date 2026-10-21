@@ -43,6 +43,56 @@ type Docs = Partial<Record<DocSlotId, OnboardingDocument>>;
 const controlCls =
   "h-11 w-full rounded-md border border-input bg-background px-3 text-base shadow-xs outline-none transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-[invalid=true]:border-destructive disabled:opacity-60 md:text-sm";
 
+function F({
+  name,
+  label,
+  hint,
+  className,
+  error,
+  children,
+}: {
+  name: keyof WelcomeValues;
+  label: string;
+  hint?: string;
+  className?: string;
+  error?: string | undefined;
+  children: ReactNode;
+}) {
+  return (
+    <div className={cn("space-y-1.5", className)}>
+      <Label htmlFor={`f-${name}`}>{label}</Label>
+      {children}
+      {hint && !error && <p className="text-xs text-muted-foreground">{hint}</p>}
+      {error && (
+        <p id={`f-${name}-err`} role="alert" className="text-xs text-destructive">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function NativeSelect({
+  options,
+  reg,
+  a11y,
+}: {
+  options: string[];
+  reg: UseFormRegisterReturn;
+  a11y: Record<string, unknown>;
+}) {
+  return (
+    <select {...a11y} {...reg} className={controlCls}>
+      <option value="">Seç</option>
+      {options.map((o) => (
+        <option key={o} value={o}>
+          {o}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; company: CompanyProfile }) {
   const qc = useQueryClient();
   const isCorrection = invite.status === "duzeltme_istendi";
@@ -193,50 +243,6 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
     "aria-required": name !== "military" ? true : undefined,
   });
 
-  const F = ({
-    name,
-    label,
-    hint,
-    className,
-    children,
-  }: {
-    name: keyof WelcomeValues;
-    label: string;
-    hint?: string;
-    className?: string;
-    children: ReactNode;
-  }) => (
-    <div className={cn("space-y-1.5", className)}>
-      <Label htmlFor={`f-${name}`}>{label}</Label>
-      {children}
-      {hint && !errors[name] && <p className="text-xs text-muted-foreground">{hint}</p>}
-      {errors[name] && (
-        <p id={`f-${name}-err`} role="alert" className="text-xs text-destructive">
-          {errors[name]?.message}
-        </p>
-      )}
-    </div>
-  );
-
-  const Select = ({
-    name,
-    options,
-    reg,
-  }: {
-    name: keyof WelcomeValues;
-    options: string[];
-    reg: UseFormRegisterReturn;
-  }) => (
-    <select {...field(name)} {...reg} className={controlCls}>
-      <option value="">Seç</option>
-      {options.map((o) => (
-        <option key={o} value={o}>
-          {o}
-        </option>
-      ))}
-    </select>
-  );
-
   const phoneReg = (name: "phone" | "emergencyPhone") => {
     const r = register(name);
     return {
@@ -300,54 +306,54 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
 
         {step.id === "kisisel" && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <F name="fullName" label="Ad soyad" className="sm:col-span-2">
+            <F name="fullName" error={errors.fullName?.message} label="Ad soyad" className="sm:col-span-2">
               <Input className="h-11 text-base md:text-sm" autoComplete="name" {...field("fullName")} {...register("fullName")} />
             </F>
-            <F name="tckn" label="TC kimlik no">
+            <F name="tckn" error={errors.tckn?.message} label="TC kimlik no">
               <Input className="h-11 text-base md:text-sm" inputMode="numeric" maxLength={11} autoComplete="off" {...field("tckn")} {...register("tckn")} />
             </F>
-            <F name="birthDate" label="Doğum tarihi">
+            <F name="birthDate" error={errors.birthDate?.message} label="Doğum tarihi">
               <Input type="date" className="h-11 text-base md:text-sm" autoComplete="bday" {...field("birthDate")} {...register("birthDate")} />
             </F>
-            <F name="birthPlace" label="Doğum yeri">
+            <F name="birthPlace" error={errors.birthPlace?.message} label="Doğum yeri">
               <Input className="h-11 text-base md:text-sm" {...field("birthPlace")} {...register("birthPlace")} />
             </F>
-            <F name="nationality" label="Uyruk">
+            <F name="nationality" error={errors.nationality?.message} label="Uyruk">
               <Input className="h-11 text-base md:text-sm" {...field("nationality")} {...register("nationality")} />
             </F>
-            <F name="motherName" label="Anne adı">
+            <F name="motherName" error={errors.motherName?.message} label="Anne adı">
               <Input className="h-11 text-base md:text-sm" {...field("motherName")} {...register("motherName")} />
             </F>
-            <F name="fatherName" label="Baba adı">
+            <F name="fatherName" error={errors.fatherName?.message} label="Baba adı">
               <Input className="h-11 text-base md:text-sm" {...field("fatherName")} {...register("fatherName")} />
             </F>
-            <F name="maritalStatus" label="Medeni hal">
-              <Select name="maritalStatus" options={["Bekâr", "Evli", "Boşanmış", "Dul"]} reg={register("maritalStatus")} />
+            <F name="maritalStatus" error={errors.maritalStatus?.message} label="Medeni hal">
+              <NativeSelect a11y={field("maritalStatus")} options={["Bekâr", "Evli", "Boşanmış", "Dul"]} reg={register("maritalStatus")} />
             </F>
-            <F name="gender" label="Cinsiyet">
-              <Select name="gender" options={["Kadın", "Erkek", "Belirtmek istemiyorum"]} reg={register("gender")} />
+            <F name="gender" error={errors.gender?.message} label="Cinsiyet">
+              <NativeSelect a11y={field("gender")} options={["Kadın", "Erkek", "Belirtmek istemiyorum"]} reg={register("gender")} />
             </F>
           </div>
         )}
 
         {step.id === "iletisim" && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <F name="phone" label="Cep telefonu">
+            <F name="phone" error={errors.phone?.message} label="Cep telefonu">
               <Input type="tel" inputMode="tel" autoComplete="tel" placeholder="+90 5XX XXX XX XX" className="h-11 text-base md:text-sm" {...field("phone")} {...phoneReg("phone")} />
             </F>
-            <F name="email" label="E-posta">
+            <F name="email" error={errors.email?.message} label="E-posta">
               <Input type="email" autoComplete="email" className="h-11 text-base md:text-sm" {...field("email")} {...register("email")} />
             </F>
-            <F name="city" label="İl">
+            <F name="city" error={errors.city?.message} label="İl">
               <Input autoComplete="address-level1" className="h-11 text-base md:text-sm" {...field("city")} {...register("city")} />
             </F>
-            <F name="district" label="İlçe">
+            <F name="district" error={errors.district?.message} label="İlçe">
               <Input autoComplete="address-level2" className="h-11 text-base md:text-sm" {...field("district")} {...register("district")} />
             </F>
-            <F name="neighborhood" label="Mahalle" className="sm:col-span-2">
+            <F name="neighborhood" error={errors.neighborhood?.message} label="Mahalle" className="sm:col-span-2">
               <Input className="h-11 text-base md:text-sm" {...field("neighborhood")} {...register("neighborhood")} />
             </F>
-            <F name="address" label="Açık adres" className="sm:col-span-2">
+            <F name="address" error={errors.address?.message} label="Açık adres" className="sm:col-span-2">
               <textarea rows={3} autoComplete="street-address" className={cn(controlCls, "h-auto py-2")} {...field("address")} {...register("address")} />
             </F>
           </div>
@@ -355,28 +361,28 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
 
         {step.id === "egitim" && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <F name="educationLevel" label="Öğrenim durumu">
-              <Select name="educationLevel" options={["İlkokul", "Ortaokul", "Lise", "Ön lisans", "Lisans", "Yüksek lisans", "Doktora"]} reg={register("educationLevel")} />
+            <F name="educationLevel" error={errors.educationLevel?.message} label="Öğrenim durumu">
+              <NativeSelect a11y={field("educationLevel")} options={["İlkokul", "Ortaokul", "Lise", "Ön lisans", "Lisans", "Yüksek lisans", "Doktora"]} reg={register("educationLevel")} />
             </F>
-            <F name="graduationYear" label="Mezuniyet yılı">
+            <F name="graduationYear" error={errors.graduationYear?.message} label="Mezuniyet yılı">
               <Input inputMode="numeric" maxLength={4} className="h-11 text-base md:text-sm" {...field("graduationYear")} {...register("graduationYear")} />
             </F>
-            <F name="school" label="Okul / bölüm" className="sm:col-span-2">
+            <F name="school" error={errors.school?.message} label="Okul / bölüm" className="sm:col-span-2">
               <Input className="h-11 text-base md:text-sm" {...field("school")} {...register("school")} />
             </F>
-            <F name="previouslyInsured" label="Daha önce sigortalı (SGK) çalıştın mı?" className="sm:col-span-2">
-              <Select name="previouslyInsured" options={["Evet", "Hayır"]} reg={register("previouslyInsured")} />
+            <F name="previouslyInsured" error={errors.previouslyInsured?.message} label="Daha önce sigortalı (SGK) çalıştın mı?" className="sm:col-span-2">
+              <NativeSelect a11y={field("previouslyInsured")} options={["Evet", "Hayır"]} reg={register("previouslyInsured")} />
             </F>
             {gender === "Erkek" && (
-              <F name="military" label="Askerlik durumu" className="sm:col-span-2">
-                <Select name="military" options={["Yapıldı", "Tecilli", "Muaf"]} reg={register("military")} />
+              <F name="military" error={errors.military?.message} label="Askerlik durumu" className="sm:col-span-2">
+                <NativeSelect a11y={field("military")} options={["Yapıldı", "Tecilli", "Muaf"]} reg={register("military")} />
               </F>
             )}
           </div>
         )}
 
         {step.id === "banka" && (
-          <F name="iban" label="IBAN" hint="Maaşının yatırılacağı, adına kayıtlı hesabın IBAN'ı.">
+          <F name="iban" error={errors.iban?.message} label="IBAN" hint="Maaşının yatırılacağı, adına kayıtlı hesabın IBAN'ı.">
             <Input
               autoComplete="off"
               placeholder="TR00 0000 0000 0000 0000 0000 00"
@@ -393,13 +399,13 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
 
         {step.id === "acil" && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <F name="emergencyName" label="Ad soyad" className="sm:col-span-2">
+            <F name="emergencyName" error={errors.emergencyName?.message} label="Ad soyad" className="sm:col-span-2">
               <Input className="h-11 text-base md:text-sm" {...field("emergencyName")} {...register("emergencyName")} />
             </F>
-            <F name="emergencyRelation" label="Yakınlık">
+            <F name="emergencyRelation" error={errors.emergencyRelation?.message} label="Yakınlık">
               <Input placeholder="Örn. Anne, Eş" className="h-11 text-base md:text-sm" {...field("emergencyRelation")} {...register("emergencyRelation")} />
             </F>
-            <F name="emergencyPhone" label="Telefon">
+            <F name="emergencyPhone" error={errors.emergencyPhone?.message} label="Telefon">
               <Input type="tel" inputMode="tel" placeholder="+90 5XX XXX XX XX" className="h-11 text-base md:text-sm" {...field("emergencyPhone")} {...phoneReg("emergencyPhone")} />
             </F>
           </div>
