@@ -34,7 +34,7 @@ function loadWidget<K extends keyof DashboardWidgets>(widget: K, period: Dashboa
   const month = dashboardUpdatedAt.slice(0, 7);
   const dates = dashboardDates.filter((d) => withinDashboardRange(d.at, to, to + period * 86400000)).sort((a, b) => a.at.localeCompare(b.at));
   const data: DashboardWidgets = {
-    overview: { metrics, updatedAt: dashboardUpdatedAt, critical: dashboardAlerts.filter((a) => a.severity === "kritik" && withinDashboardRange(a.at, to - 7 * 86400000, to)).length, pending: metrics.find((m) => m.id === "onboarding")?.value ?? 0 },
+    overview: { metrics, updatedAt: dashboardUpdatedAt, critical: dashboardAlerts.filter((a) => a.severity === "kritik" && withinDashboardRange(a.at, to - 7 * 86400000, to)).length, pending: dashboardObservations.at(-1)?.onboarding ?? 0 },
     priorities,
     departments: db.pulseDepartments.map((d) => dashboardDepartment(d, db.departments.find((dep) => dep.id === d.departmentId)?.name ?? "—", adjustment)).sort((a, b) => (b.suppressed ? -1 : b.score) - (a.suppressed ? -1 : a.score)),
     trend: Array.from({ length: 12 }, (_, i) => {
@@ -45,7 +45,7 @@ function loadWidget<K extends keyof DashboardWidgets>(widget: K, period: Dashboa
     }),
     topics,
     alerts: dashboardAlerts.filter((a) => inRange(a.at)),
-    onboarding: db.onboardingInvites.filter((inv) => inv.startDate.startsWith(month) && inRange(inv.createdAt)),
+    onboarding: db.onboardingInvites.filter((inv) => inv.startDate.startsWith(month) && (inRange(inv.createdAt) || new Date(inv.createdAt).getTime() > to)),
     dates,
   };
   return data[widget];
