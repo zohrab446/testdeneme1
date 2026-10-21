@@ -43,7 +43,7 @@ export function PageScaffold<T>({
       </div>
     );
   } else if (q.isError) {
-    body = <ErrorState message={q.error.message} onRetry={() => q.refetch()} />;
+    body = <ErrorState message={q.error.message} onRetry={() => void q.refetch()} />;
   } else if (isEmpty(q.data) || !children) {
     body = <EmptyState icon={icon} title={emptyTitle} description={emptyDescription} />;
   } else {
