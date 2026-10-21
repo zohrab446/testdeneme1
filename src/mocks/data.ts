@@ -218,17 +218,7 @@ export const sentimentSeries: SentimentPoint[] = Array.from({ length: 8 }, (_, i
   responses: 40 + i * 3,
 }));
 
-export const customerReviews: CustomerReview[] = [
-  {
-    id: "r1",
-    source: "google",
-    author: "Ali V.",
-    rating: 2,
-    text: "Ürün güzel ama kargo çok geç geldi.",
-    sentiment: "olumsuz",
-    createdAt: "2026-10-18",
-  },
-];
+export { customerReviews, vocSources } from "./voc";
 
 export const integrations: Integration[] = [
   { id: "slack", name: "Slack", category: "iletisim", connected: false },
