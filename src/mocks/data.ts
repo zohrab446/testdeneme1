@@ -240,3 +240,21 @@ export const dashboardSummary: DashboardSummary = {
   openActions: 5,
   estimatedImpact: 125450.5,
 };
+
+onboardingInvites.push({
+  id: "o6",
+  token: "tk-eski-0a0a",
+  employeeName: "Kerem Yıldız",
+  email: "kerem@ornek.com.tr",
+  title: "Muhasebe Uzmanı",
+  departmentId: "d2",
+  startDate: "2026-11-15",
+  status: "davet_gonderildi",
+  progress: 0,
+  createdAt: "2026-10-05T09:00:00",
+  expiresAt: "2026-10-12T09:00:00",
+  documents: [],
+  activity: [{ id: "act0", type: "davet_gonderildi", label: "Davet gönderildi", at: "2026-10-05T09:00:00" }],
+});
+
+export const companyProfile = { name: "Demo Şirket A.Ş.", kvkkContact: "kvkk@demosirket.com.tr" };

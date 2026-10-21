@@ -6,6 +6,9 @@ import type {
   OnboardingActivity,
   OnboardingInvite,
   ReviewStatus,
+  CompanyProfile,
+  SubmitOnboardingInput,
+  OnboardingDocument,
 } from "@/types";
 import { delay, mockResponse } from "./http";
 
@@ -124,4 +127,47 @@ export async function getSgkExport(id: string) {
     iban: rec.details?.bank.iban ?? "",
     hazirlanmaZamani: new Date().toISOString(),
   };
+}
+
+export const getCompanyProfile = (): Promise<CompanyProfile> => mockResponse(db.companyProfile);
+
+/** Çalışan formu ilk kez açtığında durumu "Form Dolduruluyor"a çeker. */
+export async function openInviteForm(token: string): Promise<void> {
+  await delay(200, 300);
+  const rec = db.onboardingInvites.find((i) => i.token === token);
+  if (rec && rec.status === "davet_gonderildi") {
+    rec.status = "form_dolduruluyor";
+    rec.progress = Math.max(rec.progress, 10);
+    log(rec, "form_acildi", "Form açıldı");
+  }
+}
+
+/** Mock yükleme: gerçek backend'de dosya depoya yüklenip meta veri döner. */
+export async function uploadDocument(
+  slotId: string,
+  file: { name: string; type: string; size: number },
+): Promise<OnboardingDocument> {
+  await delay(300, 700);
+  return {
+    id: slotId,
+    name: file.name,
+    kind: file.type === "application/pdf" ? "pdf" : "gorsel",
+    sizeKb: Math.max(1, Math.round(file.size / 1024)),
+    status: "bekliyor",
+  };
+}
+
+export async function submitOnboardingForm(token: string, input: SubmitOnboardingInput) {
+  await delay();
+  const rec = db.onboardingInvites.find((i) => i.token === token);
+  if (!rec) throw new Error("Davet bulunamadı.");
+  const wasCorrection = rec.status === "duzeltme_istendi";
+  rec.details = structuredClone(input.details);
+  const byId = new Map(rec.documents.map((d) => [d.id, d]));
+  input.documents.forEach((d) => byId.set(d.id, { ...d, status: "bekliyor" }));
+  rec.documents = [...byId.values()];
+  rec.status = "onay_bekliyor";
+  rec.progress = 100;
+  rec.correction = undefined;
+  log(rec, "form_gonderildi", wasCorrection ? "Düzeltilmiş form gönderildi" : "Form gönderildi");
 }
