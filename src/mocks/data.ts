@@ -1,6 +1,5 @@
 import type {
   ActionCard,
-  CustomerReview,
   DashboardSummary,
   Department,
   Employee,
