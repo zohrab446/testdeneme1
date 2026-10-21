@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AksiyonlarRouteImport } from './routes/aksiyonlar'
+import { Route as AyarlarRouteImport } from './routes/ayarlar'
+import { Route as CalisanNabziRouteImport } from './routes/calisan-nabzi'
+import { Route as EntegrasyonlarRouteImport } from './routes/entegrasyonlar'
+import { Route as MusteriSesiRouteImport } from './routes/musteri-sesi'
+import { Route as KarsilamaTokenRouteImport } from './routes/karsilama.$token'
+import { Route as OnboardingIndexRouteImport } from './routes/onboarding.index'
+import { Route as OnboardingIdRouteImport } from './routes/onboarding.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AksiyonlarRoute = AksiyonlarRouteImport.update({
+  id: '/aksiyonlar',
+  path: '/aksiyonlar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AyarlarRoute = AyarlarRouteImport.update({
+  id: '/ayarlar',
+  path: '/ayarlar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalisanNabziRoute = CalisanNabziRouteImport.update({
+  id: '/calisan-nabzi',
+  path: '/calisan-nabzi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntegrasyonlarRoute = EntegrasyonlarRouteImport.update({
+  id: '/entegrasyonlar',
+  path: '/entegrasyonlar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MusteriSesiRoute = MusteriSesiRouteImport.update({
+  id: '/musteri-sesi',
+  path: '/musteri-sesi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KarsilamaTokenRoute = KarsilamaTokenRouteImport.update({
+  id: '/karsilama/$token',
+  path: '/karsilama/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
+  id: '/onboarding/',
+  path: '/onboarding/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingIdRoute = OnboardingIdRouteImport.update({
+  id: '/onboarding/$id',
+  path: '/onboarding/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aksiyonlar': typeof AksiyonlarRoute
+  '/ayarlar': typeof AyarlarRoute
+  '/calisan-nabzi': typeof CalisanNabziRoute
+  '/entegrasyonlar': typeof EntegrasyonlarRoute
+  '/musteri-sesi': typeof MusteriSesiRoute
+  '/karsilama/$token': typeof KarsilamaTokenRoute
+  '/onboarding/$id': typeof OnboardingIdRoute
+  '/onboarding/': typeof OnboardingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aksiyonlar': typeof AksiyonlarRoute
+  '/ayarlar': typeof AyarlarRoute
+  '/calisan-nabzi': typeof CalisanNabziRoute
+  '/entegrasyonlar': typeof EntegrasyonlarRoute
+  '/musteri-sesi': typeof MusteriSesiRoute
+  '/karsilama/$token': typeof KarsilamaTokenRoute
+  '/onboarding/$id': typeof OnboardingIdRoute
+  '/onboarding': typeof OnboardingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aksiyonlar': typeof AksiyonlarRoute
+  '/ayarlar': typeof AyarlarRoute
+  '/calisan-nabzi': typeof CalisanNabziRoute
+  '/entegrasyonlar': typeof EntegrasyonlarRoute
+  '/musteri-sesi': typeof MusteriSesiRoute
+  '/karsilama/$token': typeof KarsilamaTokenRoute
+  '/onboarding/$id': typeof OnboardingIdRoute
+  '/onboarding/': typeof OnboardingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/aksiyonlar'
+    | '/ayarlar'
+    | '/calisan-nabzi'
+    | '/entegrasyonlar'
+    | '/musteri-sesi'
+    | '/karsilama/$token'
+    | '/onboarding/$id'
+    | '/onboarding/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/aksiyonlar'
+    | '/ayarlar'
+    | '/calisan-nabzi'
+    | '/entegrasyonlar'
+    | '/musteri-sesi'
+    | '/karsilama/$token'
+    | '/onboarding/$id'
+    | '/onboarding'
+  id:
+    | '__root__'
+    | '/'
+    | '/aksiyonlar'
+    | '/ayarlar'
+    | '/calisan-nabzi'
+    | '/entegrasyonlar'
+    | '/musteri-sesi'
+    | '/karsilama/$token'
+    | '/onboarding/$id'
+    | '/onboarding/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AksiyonlarRoute: typeof AksiyonlarRoute
+  AyarlarRoute: typeof AyarlarRoute
+  CalisanNabziRoute: typeof CalisanNabziRoute
+  EntegrasyonlarRoute: typeof EntegrasyonlarRoute
+  MusteriSesiRoute: typeof MusteriSesiRoute
+  KarsilamaTokenRoute: typeof KarsilamaTokenRoute
+  OnboardingIdRoute: typeof OnboardingIdRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +156,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aksiyonlar': {
+      id: '/aksiyonlar'
+      path: '/aksiyonlar'
+      fullPath: '/aksiyonlar'
+      preLoaderRoute: typeof AksiyonlarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ayarlar': {
+      id: '/ayarlar'
+      path: '/ayarlar'
+      fullPath: '/ayarlar'
+      preLoaderRoute: typeof AyarlarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calisan-nabzi': {
+      id: '/calisan-nabzi'
+      path: '/calisan-nabzi'
+      fullPath: '/calisan-nabzi'
+      preLoaderRoute: typeof CalisanNabziRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entegrasyonlar': {
+      id: '/entegrasyonlar'
+      path: '/entegrasyonlar'
+      fullPath: '/entegrasyonlar'
+      preLoaderRoute: typeof EntegrasyonlarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/musteri-sesi': {
+      id: '/musteri-sesi'
+      path: '/musteri-sesi'
+      fullPath: '/musteri-sesi'
+      preLoaderRoute: typeof MusteriSesiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/karsilama/$token': {
+      id: '/karsilama/$token'
+      path: '/karsilama/$token'
+      fullPath: '/karsilama/$token'
+      preLoaderRoute: typeof KarsilamaTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/onboarding'
+      fullPath: '/onboarding/'
+      preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/$id': {
+      id: '/onboarding/$id'
+      path: '/onboarding/$id'
+      fullPath: '/onboarding/$id'
+      preLoaderRoute: typeof OnboardingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AksiyonlarRoute: AksiyonlarRoute,
+  AyarlarRoute: AyarlarRoute,
+  CalisanNabziRoute: CalisanNabziRoute,
+  EntegrasyonlarRoute: EntegrasyonlarRoute,
+  MusteriSesiRoute: MusteriSesiRoute,
+  KarsilamaTokenRoute: KarsilamaTokenRoute,
+  OnboardingIdRoute: OnboardingIdRoute,
+  OnboardingIndexRoute: OnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
