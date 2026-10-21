@@ -194,3 +194,40 @@ export interface CompanySetup {
   goals: string[];
   completedAt: ISODate;
 }
+
+export type PulseSourceStatus = "bagli" | "bagli_degil" | "hata";
+export interface PulseSource {
+  id: "slack" | "teams" | "oneri" | "csv";
+  name: string;
+  description: string;
+  status: PulseSourceStatus;
+  lastSync?: ISODate | undefined;
+  errorMessage?: string | undefined;
+}
+
+export type PulseTopicId = "mesai" | "yonetici" | "maas" | "belirsizlik" | "denge";
+export type RiskLevel = "dusuk" | "orta" | "yuksek";
+
+/** Ham departman nabız verisi (yalnızca servis katmanında kullanılır). */
+export interface RawDepartmentPulse {
+  departmentId: ID;
+  respondents: number;
+  topics: Record<PulseTopicId, number>; // 0-100, yüksek = olumlu
+  trend: number[]; // 12 haftalık duygu skoru 0-100
+  risk: RiskLevel;
+  riskReasons: string[];
+  themes: string[];
+  quotes: string[];
+  actionCardId?: ID | undefined;
+}
+
+/** UI'ya giden, gizlilik eşiği uygulanmış departman verisi. */
+export type DepartmentPulse =
+  | { departmentId: ID; departmentName: string; suppressed: true }
+  | (Omit<RawDepartmentPulse, "respondents"> & { departmentName: string; suppressed: false });
+
+export interface PulseOverview {
+  weeks: ISODate[];
+  companyTrend: number[];
+  departments: DepartmentPulse[];
+}
