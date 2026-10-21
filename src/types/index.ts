@@ -159,15 +159,54 @@ export interface SentimentPoint {
   departmentId?: ID;
 }
 
+export type VocSourceId = "trendyol" | "sikayetvar" | "google" | "hepsiburada" | "appstore" | "csv";
+export type VocTopic = "kargo" | "fiyat" | "kalite" | "musteri_hizmetleri" | "uygulama" | "iade";
+export type VocSentiment = "olumlu" | "notr" | "olumsuz";
+
 export interface CustomerReview {
   id: ID;
-  source: "google" | "trendyol" | "hepsiburada" | "sikayetvar" | "anket";
+  source: VocSourceId;
   author: string;
   rating: number; // 1-5
   text: string;
-  sentiment: "olumlu" | "notr" | "olumsuz";
+  topic: VocTopic;
+  sentiment: VocSentiment;
   createdAt: ISODate;
 }
+
+export interface VocSource {
+  id: VocSourceId;
+  name: string;
+  description: string;
+  status: "bagli" | "bagli_degil" | "hata";
+  reviewCount: number;
+  lastSync?: ISODate | undefined;
+  errorMessage?: string | undefined;
+}
+
+export interface VocFilter {
+  from: ISODate;
+  to: ISODate;
+  sources: VocSourceId[];
+}
+
+export interface VocAnalytics {
+  total: number;
+  sentiment: Record<VocSentiment, number>;
+  complaints: { topic: VocTopic; count: number }[];
+  weeks: ISODate[];
+  topicTrend: Record<VocTopic, number[]>;
+}
+
+export interface VocAnswer {
+  matched: true;
+  question: string;
+  finding: string;
+  stats: { label: string; value: string }[];
+  samples: CustomerReview[];
+  action: { title: string; summary: string; severity: Severity };
+}
+export type VocAskResult = VocAnswer | { matched: false; suggestions: string[] };
 
 export interface Integration {
   id: ID;
