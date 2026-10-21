@@ -25,7 +25,60 @@ export interface Employee {
   status: "aktif" | "izinde" | "ayrildi" | "aday";
 }
 
-export type InviteStatus = "gonderildi" | "acildi" | "tamamlandi" | "suresi_doldu";
+export type InviteStatus =
+  | "davet_gonderildi"
+  | "form_dolduruluyor"
+  | "onay_bekliyor"
+  | "duzeltme_istendi"
+  | "tamamlandi";
+
+export type ReviewStatus = "bekliyor" | "onaylandi" | "reddedildi";
+
+export interface OnboardingDocument {
+  id: ID;
+  name: string;
+  kind: "gorsel" | "pdf";
+  sizeKb: number;
+  status: ReviewStatus;
+}
+
+export interface OnboardingActivity {
+  id: ID;
+  type:
+    | "davet_gonderildi"
+    | "davet_tekrar"
+    | "form_acildi"
+    | "form_gonderildi"
+    | "duzeltme_istendi"
+    | "belge_onaylandi"
+    | "belge_reddedildi"
+    | "onaylandi";
+  label: string;
+  at: ISODate;
+  note?: string | undefined;
+}
+
+export type TransferStatus = "hazirlaniyor" | "hazir" | "aktarildi";
+
+export interface DataTransferItem {
+  id: "sgk" | "bordro" | "ozluk" | "sozlesme";
+  title: string;
+  description: string;
+  status: TransferStatus;
+}
+
+export interface OnboardingDetails {
+  personal: { birthDate: ISODate; birthPlace: string; gender: string; maritalStatus: string; tckn: string };
+  contact: { phone: string; email: string; address: string; city: string };
+  education: { school: string; degree: string; graduationYear: number; previousEmployer: string };
+  bank: { bankName: string; iban: string };
+  emergency: { name: string; relation: string; phone: string };
+}
+
+export interface CorrectionRequest {
+  targets: string[];
+  note: string;
+}
 
 export interface OnboardingInvite {
   id: ID;
@@ -38,6 +91,12 @@ export interface OnboardingInvite {
   status: InviteStatus;
   progress: number; // 0-100
   createdAt: ISODate;
+  expiresAt: ISODate;
+  details?: OnboardingDetails | undefined;
+  documents: OnboardingDocument[];
+  activity: OnboardingActivity[];
+  transfers?: DataTransferItem[] | undefined;
+  correction?: CorrectionRequest | undefined;
 }
 
 export interface CreateEmployeeInviteInput {

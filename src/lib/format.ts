@@ -29,3 +29,12 @@ export function maskValue(value: string, visible = 4) {
   if (value.length <= visible) return "•".repeat(value.length);
   return "•".repeat(Math.max(4, value.length - visible)) + value.slice(-visible);
 }
+
+/** gg.aa.yyyy ss:dd */
+export function formatDateTime(input: string | Date) {
+  const d = typeof input === "string" ? new Date(input) : input;
+  if (Number.isNaN(d.getTime())) return "—";
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${formatDate(d)} ${hh}:${mi}`;
+}
