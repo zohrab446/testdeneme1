@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Plug } from "lucide-react";
 import { PageScaffold } from "@/components/common/PageScaffold";
-import { getIntegrations } from "@/services";
+import { IntegrationCatalog } from "@/components/integrations/IntegrationCatalog";
+import { getIntegrationCatalog } from "@/services/integrations";
 
 export const Route = createFileRoute("/entegrasyonlar")({
   head: () => ({
@@ -10,6 +11,8 @@ export const Route = createFileRoute("/entegrasyonlar")({
       { name: "description", content: "Veri kaynaklarınızı bağlayın." },
       { property: "og:title", content: "Entegrasyonlar · [ÜRÜN ADI]" },
       { property: "og:description", content: "Veri kaynaklarınızı bağlayın." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Page,
@@ -19,11 +22,14 @@ function Page() {
   return (
     <PageScaffold
       title="Entegrasyonlar"
-      description="Veri kaynaklarınızı bağlayın."
+      description="Çalışan ve müşteri kaynaklarınız, tek çalışma alanında. Örnek bağlantılar; değişiklikler yenilemede sıfırlanır."
       icon={Plug}
-      queryKey={["integrations"]}
-      queryFn={getIntegrations}
+      queryKey={["integration-catalog"]}
+      queryFn={getIntegrationCatalog}
       emptyTitle="Henüz entegrasyon yok"
-    />
+      emptyDescription="Kullanılabilir kaynaklar burada listelenecek."
+    >
+      {sources => <IntegrationCatalog sources={sources} />}
+    </PageScaffold>
   );
 }

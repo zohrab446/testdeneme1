@@ -18,3 +18,4 @@
 - Employee welcome form step `hrLabel`s must match the HR correction section labels, and document slot ids match `OnboardingDocument.id` — correction mode unlocks only flagged steps/docs by these keys.
 - Dashboard period aggregation and privacy filtering live in its service/helper layer; all widgets share one snapshot timestamp so period comparisons stay coherent.
 - Dashboard reuses `NewEmployeeSheet` unchanged and converts actions through a mock service; task creation is idempotent per action and remains in memory like other mock mutations.
+- The integrations catalog uses its own typed mock service, leaving existing pulse and customer-source flows unchanged; consent and channel allowlists are validated by services before mutations.
