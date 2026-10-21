@@ -1,0 +1,67 @@
+import { integrationCatalog } from "@/mocks/integrations";
+import { validateIntegrationChannels, syncFrequencies } from "@/lib/integrations";
+import type { IntegrationConnection, SyncFrequency } from "@/types/integrations";
+import { delay, mockResponse } from "./http";
+
+export const getIntegrationCatalog = (): Promise<IntegrationConnection[]> => mockResponse(integrationCatalog, []);
+function find(id: string) {
+  const source = integrationCatalog.find(item => item.id === id);
+  if (!source) throw new Error("Kaynak bulunamadı.");
+  return source;
+}
+function record(source: IntegrationConnection, success: boolean, detail?: string) {
+  const at = new Date().toISOString();
+  source.logs = [{ id: crypto.randomUUID(), at, success, count: success ? 42 : 0, detail }, ...source.logs].slice(0, 10);
+  if (success) source.lastSync = at;
+}
+export async function testIntegrationConnection(id: string, consent: boolean, channels: string[]) {
+  const source = find(id);
+  if (source.status === "yakinda") throw new Error("Bu kaynak henüz kullanıma açılmadı.");
+  if (!consent) throw new Error("KVKK onayı olmadan bağlantı kurulamaz.");
+  const selected = validateIntegrationChannels(source, channels);
+  await delay(700, 800);
+  if (Math.random() < 0.35) {
+    source.status = "hata";
+    source.error = "Bağlantı testi zaman aşımına uğradı. İzinleri kontrol edip tekrar deneyin.";
+    record(source, false, source.error);
+    throw new Error(source.error);
+  }
+  source.status = "bagli";
+  source.error = undefined;
+  source.consent = true;
+  source.selectedChannels = selected;
+  source.deleteAt = undefined;
+  record(source, true);
+  return structuredClone(source);
+}
+export async function saveIntegrationSettings(id: string, frequency: SyncFrequency, channels: string[]) {
+  const source = find(id);
+  if (source.status !== "bagli" && source.status !== "hata") throw new Error("Önce kaynağı bağlayın.");
+  if (!source.consent) throw new Error("Önce KVKK onayıyla bağlantıyı tamamlayın.");
+  if (!(frequency in syncFrequencies)) throw new Error("Geçerli bir senkron sıklığı seçin.");
+  const selected = validateIntegrationChannels(source, channels);
+  await delay();
+  source.frequency = frequency;
+  source.selectedChannels = selected;
+  return structuredClone(source);
+}
+export async function disconnectIntegration(id: string) {
+  const source = find(id);
+  await delay();
+  source.status = "bagli_degil";
+  source.consent = false;
+  source.selectedChannels = [];
+  source.error = undefined;
+  const expiry = new Date();
+  expiry.setDate(expiry.getDate() + source.deletionDays);
+  source.deleteAt = expiry.toISOString();
+  return structuredClone(source);
+}
+export async function requestIntegrationNotification(id: string, email: string) {
+  const source = find(id);
+  if (source.status !== "yakinda") throw new Error("Bu kaynak zaten kullanıma açık.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Geçerli bir e-posta adresi girin.");
+  await delay();
+  source.notificationEmail = email.trim();
+  return structuredClone(source);
+}
