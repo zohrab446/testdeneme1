@@ -10,6 +10,8 @@ import type {
   OnboardingDocument,
   OnboardingActivity,
   DataTransferItem,
+  PulseSource,
+  RawDepartmentPulse,
   SentimentPoint,
 } from "@/types";
 
@@ -18,6 +20,7 @@ export const departments: Department[] = [
   { id: "d2", name: "Operasyon", headcount: 18 },
   { id: "d3", name: "Yazılım", headcount: 9 },
   { id: "d4", name: "Müşteri Hizmetleri", headcount: 7 },
+  { id: "d5", name: "Hukuk", headcount: 3 },
 ];
 
 export const employees: Employee[] = [
@@ -203,6 +206,10 @@ export const actionCards: ActionCard[] = [
     status: "yeni",
     createdAt: "2026-10-19",
   },
+  { id: "a2", title: "Operasyonda aşırı mesai yükünü dengele", summary: "Vardiya planı ve ek personel ihtiyacını gözden geçir.", source: "calisan", severity: "kritik", status: "yeni", createdAt: "2026-10-18" },
+  { id: "a3", title: "Satış ekibinde prim sistemini netleştir", summary: "Prim hesaplamasıyla ilgili belirsizlik memnuniyeti düşürüyor.", source: "calisan", severity: "uyari", status: "yeni", createdAt: "2026-10-17" },
+  { id: "a4", title: "Müşteri hizmetlerinde rol tanımlarını güncelle", summary: "Görev belirsizliği ve yönetici geri bildirimi eksikliği öne çıkıyor.", source: "karma", severity: "uyari", status: "devam", createdAt: "2026-10-15" },
+  { id: "a5", title: "Yazılım ekibinin esnek çalışma düzenini koru", summary: "İş-yaşam dengesi güçlü; mevcut uygulamaları sürdür.", source: "calisan", severity: "basari", status: "yeni", createdAt: "2026-10-14" },
 ];
 
 export const sentimentSeries: SentimentPoint[] = Array.from({ length: 8 }, (_, i) => ({
@@ -258,3 +265,54 @@ onboardingInvites.push({
 });
 
 export const companyProfile = { name: "Demo Şirket A.Ş.", kvkkContact: "kvkk@demosirket.com.tr" };
+
+export const pulseSources: PulseSource[] = [
+  { id: "slack", name: "Slack", description: "Herkese açık kanallardaki mesajlar", status: "bagli", lastSync: "2026-10-21T07:30:00" },
+  { id: "teams", name: "Microsoft Teams", description: "Ekip kanallarındaki gönderiler", status: "hata", errorMessage: "Yetki süresi doldu, yeniden bağlanın." },
+  { id: "oneri", name: "Anonim Öneri Kutusu", description: "Çalışanların isimsiz önerileri", status: "bagli_degil" },
+  { id: "csv", name: "Anket Yükle (CSV)", description: "Kendi anket sonuçlarınız", status: "bagli_degil" },
+];
+
+const wave = (base: number, amp: number, phase: number) =>
+  Array.from({ length: 12 }, (_, i) => Math.round(base + amp * Math.sin((i + phase) / 2) + (i - 6) * 0.6));
+
+export const pulseDepartments: RawDepartmentPulse[] = [
+  {
+    departmentId: "d1", respondents: 11,
+    topics: { mesai: 58, yonetici: 66, maas: 38, belirsizlik: 52, denge: 61 },
+    trend: wave(58, 6, 0), risk: "orta", riskReasons: ["Prim sistemi belirsiz", "Maaş beklentisi karşılanmıyor"],
+    themes: ["Prim hesaplaması", "Hedef baskısı", "Ekip içi dayanışma"],
+    quotes: ["Primlerin nasıl hesaplandığını hâlâ tam anlamış değilim…", "Ekip arkadaşlarım çok destekleyici ama hedefler…", "Çeyrek sonu baskısı her seferinde artıyor…"],
+    actionCardId: "a3",
+  },
+  {
+    departmentId: "d2", respondents: 16,
+    topics: { mesai: 24, yonetici: 47, maas: 42, belirsizlik: 55, denge: 29 },
+    trend: wave(44, 5, 2).map((v, i) => v - Math.floor(i / 2)), risk: "yuksek",
+    riskReasons: ["Son 6 haftada aşırı mesai şikâyeti 2 katına çıktı", "İş-yaşam dengesi skoru şirket ortalamasının altında", "Hafta sonu çalışması yaygınlaştı"],
+    themes: ["Vardiya yükü", "Hafta sonu çalışma", "Personel eksikliği"],
+    quotes: ["Bu ay üçüncü kez hafta sonu çalışıyoruz…", "Kimse izin alamıyor çünkü yerimize bakacak…", "Yöneticimiz ilgili ama kaynak yok…"],
+    actionCardId: "a2",
+  },
+  {
+    departmentId: "d3", respondents: 8,
+    topics: { mesai: 64, yonetici: 78, maas: 61, belirsizlik: 70, denge: 82 },
+    trend: wave(72, 4, 1), risk: "dusuk", riskReasons: ["Genel memnuniyet yüksek"],
+    themes: ["Esnek çalışma", "Teknik gelişim", "Net yol haritası"],
+    quotes: ["Uzaktan çalışma esnekliği çok iyi geliyor…", "Sprint planlaması artık daha net…", "Eğitim bütçesi olsa harika olur…"],
+    actionCardId: "a5",
+  },
+  {
+    departmentId: "d4", respondents: 6,
+    topics: { mesai: 49, yonetici: 41, maas: 45, belirsizlik: 33, denge: 50 },
+    trend: wave(50, 5, 3), risk: "orta", riskReasons: ["Görev tanımları belirsiz", "Yöneticiden düzenli geri bildirim alınmıyor"],
+    themes: ["Rol belirsizliği", "Geri bildirim eksikliği", "Yoğun çağrı trafiği"],
+    quotes: ["Hangi talebin kime ait olduğu belli değil…", "Performansım hakkında en son ne zaman konuştuk…", "Yoğun saatlerde destek yetersiz kalıyor…"],
+    actionCardId: "a4",
+  },
+  {
+    departmentId: "d5", respondents: 3,
+    topics: { mesai: 40, yonetici: 40, maas: 40, belirsizlik: 40, denge: 40 },
+    trend: wave(50, 3, 0), risk: "orta", riskReasons: [], themes: [], quotes: [],
+  },
+];
