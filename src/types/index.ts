@@ -157,11 +157,11 @@ export interface ActionCard {
   kaynak?: "Çalışan" | "Müşteri";
   departman?: string;
   durum?: ActionStatus;
-  vadeTarihi?: ISODate;
-  ertelemeTarihi?: ISODate;
+  vadeTarihi?: ISODate | undefined;
+  ertelemeTarihi?: ISODate | undefined;
   olusturmaTarihi?: ISODate;
   nasilUretildi?: { aciklama: string; veriNoktasiSayisi: number };
-  impactEstimate?: number; // ₺
+  impactEstimate?: number | undefined; // ₺
   status: "yeni" | "devam" | "tamamlandi" | "ertelendi";
   createdAt: ISODate;
 }

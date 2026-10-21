@@ -12,7 +12,7 @@ export function applyAppearance(value: AppSettings["appearance"]) {
   const dark = value.theme === "koyu" || (value.theme === "sistem" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.classList.toggle("dark", dark);
   if (value.theme === "sistem") localStorage.removeItem("tema"); else localStorage.setItem("tema", value.theme);
-  document.documentElement.dataset.density = value.density;
+  document.documentElement.dataset['density'] = value.density;
 }
 export function downloadData(filename: string, content: string, type = "text/csv;charset=utf-8") {
   const url = URL.createObjectURL(new Blob([content], { type }));

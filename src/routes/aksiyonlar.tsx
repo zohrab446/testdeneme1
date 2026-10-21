@@ -38,7 +38,7 @@ function Advisor({ cards, selected }: { cards: AdvisorAction[]; selected?: strin
   const suggestions = filtered.filter(c => c.durum === "Öneri" && c.id !== selected);
   const focused = cards.find(c => c.id === selected);
   function drop(e: DragEndEvent) { if (!e.over || mutation.isPending) return; const target = String(e.over.id) as ActionStatus; const card = cards.find(c => c.id === e.active.id); if (card && columns.some(c => c.id === target) && card.durum !== target) mutation.mutate({ id: card.id, status: target }); }
-  const act = (id: string, status?: ActionStatus, days?: number) => mutation.mutate({ id, status, days });
+  const act = (id: string, status?: ActionStatus, days?: number) => mutation.mutate({ id, ...(status ? { status } : {}), ...(days ? { days } : {}) });
   return <Tabs value={tab} onValueChange={setTab} className="space-y-6">
     <TabsList><TabsTrigger value="suggestions">Öneriler <span className="ml-2 text-xs text-muted-foreground">{cards.filter(c => c.durum === "Öneri").length}</span></TabsTrigger><TabsTrigger value="tracking">Aksiyon Takibi</TabsTrigger></TabsList>
     <TabsContent value="suggestions" className="space-y-5">
