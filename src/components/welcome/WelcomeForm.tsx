@@ -205,6 +205,7 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
 
   const next = async () => {
     const ok = step.id === "belgeler" ? validateDocs() : await trigger(step.fields, { shouldFocus: true });
+    console.log("NEXT", ok, JSON.stringify(form.formState.errors));
     if (ok) goTo(stepIndex + 1);
   };
 
