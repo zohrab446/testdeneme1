@@ -5,7 +5,7 @@
 - [x] Masaüstü/mobil görünüm ve ana akış doğrulaması.
 
 # Entegrasyonlar
-- [ ] Kategorili kartlar, arama ve filtreleme.
-- [ ] İzin, KVKK, kanal seçimi ve tekrar denenebilir bağlantı testi.
-- [ ] Yönetim, senkron kayıtları, haberdar et ve bağlantı kesme.
-- [ ] Kural testleri ve masaüstü/mobil akış doğrulaması.
+- [x] Kategorili kartlar, arama ve filtreleme.
+- [x] İzin, KVKK, kanal seçimi ve tekrar denenebilir bağlantı testi.
+- [x] Yönetim, senkron kayıtları, haberdar et ve bağlantı kesme.
+- [x] Kural testleri ve masaüstü/mobil akış doğrulaması.
