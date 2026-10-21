@@ -9,7 +9,7 @@ async function finish<T>(promise: Promise<T>) { await vi.runAllTimersAsync(); re
 describe("Aksiyon kuralları", () => {
   it("10 kartın her birinde 3 uygulanabilir adım bulunur", async () => { const rows = await finish(getActionCards()); expect(rows).toHaveLength(10); expect(rows.every(c => c.aksiyonlar.length === 3 && c.bulgu && c.neden && c.nasilUretildi.veriNoktasiSayisi > 0)).toBe(true); });
   it("göreve çevirme Yapılacak olarak kalır", async () => { await finish(updateActionStatus("a1", "Yapılacak")); expect((await finish(getActionCards())).find(c => c.id === "a1")?.durum).toBe("Yapılacak"); });
-  it.each([1, 3, 7])("erteleme %i günlük dönüş tarihi oluşturur", async days => { const now = Date.now(); const card = await finish(snoozeAction("a1", days)); expect(card.durum).toBe("Ertelendi"); expect(new Date(card.ertelemeTarihi ?? "").getTime()).toBe(now + days * 86400000); });
+  it.each([1, 3, 7])("erteleme %i günlük dönüş tarihi oluşturur", async days => { const card = await finish(snoozeAction("a1", days)); expect(card.durum).toBe("Ertelendi"); expect(new Date(card.ertelemeTarihi ?? "").getTime()).toBe(Date.now() + days * 86400000); });
   it("Uygulandı aksiyonu tamamlar", async () => { expect((await finish(markActionDone("a2"))).durum).toBe("Tamamlandı"); });
   it("eski dashboard mutasyonları normalize edilir", () => { const card = actionCards[0]; if (!card) throw Error("Kart yok"); expect(normalizeAction({ ...card, status: "devam" }).durum).toBe("DevamEdiyor"); });
 });
