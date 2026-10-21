@@ -15,6 +15,7 @@ import { Route as AyarlarRouteImport } from './routes/ayarlar'
 import { Route as CalisanNabziRouteImport } from './routes/calisan-nabzi'
 import { Route as EntegrasyonlarRouteImport } from './routes/entegrasyonlar'
 import { Route as MusteriSesiRouteImport } from './routes/musteri-sesi'
+import { Route as AyarlarSekmeRouteImport } from './routes/ayarlar_.$sekme'
 import { Route as KarsilamaTokenRouteImport } from './routes/karsilama.$token'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding.index'
 import { Route as OnboardingIdRouteImport } from './routes/onboarding.$id'
@@ -49,6 +50,11 @@ const MusteriSesiRoute = MusteriSesiRouteImport.update({
   path: '/musteri-sesi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AyarlarSekmeRoute = AyarlarSekmeRouteImport.update({
+  id: '/ayarlar_/$sekme',
+  path: '/ayarlar/$sekme',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KarsilamaTokenRoute = KarsilamaTokenRouteImport.update({
   id: '/karsilama/$token',
   path: '/karsilama/$token',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
   '/musteri-sesi': typeof MusteriSesiRoute
+  '/ayarlar/$sekme': typeof AyarlarSekmeRoute
   '/karsilama/$token': typeof KarsilamaTokenRoute
   '/onboarding/$id': typeof OnboardingIdRoute
   '/onboarding/': typeof OnboardingIndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
   '/musteri-sesi': typeof MusteriSesiRoute
+  '/ayarlar/$sekme': typeof AyarlarSekmeRoute
   '/karsilama/$token': typeof KarsilamaTokenRoute
   '/onboarding/$id': typeof OnboardingIdRoute
   '/onboarding': typeof OnboardingIndexRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
   '/musteri-sesi': typeof MusteriSesiRoute
+  '/ayarlar_/$sekme': typeof AyarlarSekmeRoute
   '/karsilama/$token': typeof KarsilamaTokenRoute
   '/onboarding/$id': typeof OnboardingIdRoute
   '/onboarding/': typeof OnboardingIndexRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/calisan-nabzi'
     | '/entegrasyonlar'
     | '/musteri-sesi'
+    | '/ayarlar/$sekme'
     | '/karsilama/$token'
     | '/onboarding/$id'
     | '/onboarding/'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/calisan-nabzi'
     | '/entegrasyonlar'
     | '/musteri-sesi'
+    | '/ayarlar/$sekme'
     | '/karsilama/$token'
     | '/onboarding/$id'
     | '/onboarding'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/calisan-nabzi'
     | '/entegrasyonlar'
     | '/musteri-sesi'
+    | '/ayarlar_/$sekme'
     | '/karsilama/$token'
     | '/onboarding/$id'
     | '/onboarding/'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   CalisanNabziRoute: typeof CalisanNabziRoute
   EntegrasyonlarRoute: typeof EntegrasyonlarRoute
   MusteriSesiRoute: typeof MusteriSesiRoute
+  AyarlarSekmeRoute: typeof AyarlarSekmeRoute
   KarsilamaTokenRoute: typeof KarsilamaTokenRoute
   OnboardingIdRoute: typeof OnboardingIdRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MusteriSesiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ayarlar_/$sekme': {
+      id: '/ayarlar_/$sekme'
+      path: '/ayarlar/$sekme'
+      fullPath: '/ayarlar/$sekme'
+      preLoaderRoute: typeof AyarlarSekmeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/karsilama/$token': {
       id: '/karsilama/$token'
       path: '/karsilama/$token'
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalisanNabziRoute: CalisanNabziRoute,
   EntegrasyonlarRoute: EntegrasyonlarRoute,
   MusteriSesiRoute: MusteriSesiRoute,
+  AyarlarSekmeRoute: AyarlarSekmeRoute,
   KarsilamaTokenRoute: KarsilamaTokenRoute,
   OnboardingIdRoute: OnboardingIdRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,

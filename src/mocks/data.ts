@@ -1,3 +1,4 @@
+import type { AppSettings } from "@/types/settings";
 import type {
   ActionCard,
   DashboardSummary,
@@ -194,22 +195,27 @@ export const onboardingInvites: OnboardingInvite[] = [
 
 export const defaultTransfers = transfers;
 
-export const actionCards: ActionCard[] = [
-  {
-    id: "a1",
-    title: "Kargo gecikmesi şikâyetleri artıyor",
-    summary: "Son 14 günde olumsuz yorumların %38'i teslimat süresiyle ilgili.",
-    source: "musteri",
-    severity: "kritik",
-    impactEstimate: 42500,
-    status: "yeni",
-    createdAt: "2026-10-19",
-  },
-  { id: "a2", title: "Operasyonda aşırı mesai yükünü dengele", summary: "Vardiya planı ve ek personel ihtiyacını gözden geçir.", source: "calisan", severity: "kritik", status: "yeni", createdAt: "2026-10-18" },
-  { id: "a3", title: "Satış ekibinde prim sistemini netleştir", summary: "Prim hesaplamasıyla ilgili belirsizlik memnuniyeti düşürüyor.", source: "calisan", severity: "uyari", status: "yeni", createdAt: "2026-10-17" },
-  { id: "a4", title: "Müşteri hizmetlerinde rol tanımlarını güncelle", summary: "Görev belirsizliği ve yönetici geri bildirimi eksikliği öne çıkıyor.", source: "karma", severity: "uyari", status: "devam", createdAt: "2026-10-15" },
-  { id: "a5", title: "Yazılım ekibinin esnek çalışma düzenini koru", summary: "İş-yaşam dengesi güçlü; mevcut uygulamaları sürdür.", source: "calisan", severity: "basari", status: "yeni", createdAt: "2026-10-14" },
+const actionSeed: [string, string, string, ActionCard["source"], ActionCard["severity"], string, string, string[], string, NonNullable<ActionCard["aciliyet"]>, NonNullable<ActionCard["durum"]>, number][] = [
+  ["a1", "Kargo gecikmesi şikâyetleri artıyor", "Son 14 günde olumsuz yorumların %38'i teslimat süresiyle ilgili.", "musteri", "kritik", "Operasyon", "Yoğun günlerde sevkiyat kapasitesi yetersiz kalıyor.", ["En çok geciken 3 bölgeyi çıkar.", "Kargo firmasıyla teslimat hedefini netleştir.", "Geciken siparişlere aynı gün bilgi ver."], "Teslimat şikâyetlerinde iki haftada %15 azalma hedefleniyor.", "Kritik", "Öneri", 184],
+  ["a2", "Operasyonda aşırı mesai yükünü dengele", "Operasyon'da bu hafta şikâyet oranı %30 arttı.", "calisan", "kritik", "Operasyon", "Aşırı mesai ve belirsiz görev tanımları yükü artırıyor.", ["Vardiya başına iş yükünü ölç.", "İki yoğun vardiyaya ek destek ayır.", "Görev dağılımını ekip ile paylaş."], "Hafta sonu mesaisinin %20 azalması bekleniyor.", "Kritik", "Öneri", 96],
+  ["a3", "Satış ekibinde prim sistemini netleştir", "Prim hesaplamasıyla ilgili belirsizlik memnuniyeti düşürüyor.", "calisan", "uyari", "Satış", "Prim koşulları farklı kanallarda farklı anlatılıyor.", ["Prim kurallarını tek sayfada topla.", "Üç örnek hesaplamayı ekip ile paylaş.", "Açık sorular için 20 dakikalık toplantı yap."], "Prim hakkındaki belirsizliğin bir ayda azalması hedefleniyor.", "Yüksek", "Öneri", 63],
+  ["a4", "Müşteri hizmetlerinde rol tanımlarını güncelle", "Görev belirsizliği ve geri bildirim eksikliği öne çıkıyor.", "karma", "uyari", "Müşteri Hizmetleri", "Taleplerin hangi ekipte çözüleceği net değil.", ["En sık gelen 5 talebin sorumlusunu belirle.", "Yönlendirme tablosunu güncelle.", "Haftalık kısa geri bildirim görüşmesi planla."], "İlk yanıt süresinde %10 iyileşme bekleniyor.", "Yüksek", "DevamEdiyor", 78],
+  ["a5", "Yazılım ekibinin esnek çalışma düzenini koru", "İş-yaşam dengesi güçlü; mevcut uygulamaları sürdür.", "calisan", "basari", "Yazılım", "Odak saatleri ve esnek çalışma olumlu karşılanıyor.", ["Odak saatlerini takvimlerde koru.", "Başarılı çalışma düzenini belgeleyip paylaş.", "Bir ay sonra kısa nabız anketi yap."], "Mevcut yüksek memnuniyetin korunması bekleniyor.", "Düşük", "Öneri", 42],
+  ["a6", "Ödeme adımındaki hataları azalt", "Son hafta ödeme hatası yorumları %24 arttı.", "musteri", "kritik", "Yazılım", "Son sürümde bazı cihazlarda ödeme ekranı kapanıyor.", ["Hata kayıtlarını cihaz bazında incele.", "En sık hataya düzeltme sürümü çıkar.", "Sonucu mağaza yorumlarında paylaş."], "Başarısız ödeme sayısında %25 azalma hedefleniyor.", "Kritik", "Yapılacak", 137],
+  ["a7", "İade sürecini sadeleştir", "İade konusunda 48 yorumda tekrar eden adımlar bildirildi.", "musteri", "uyari", "Operasyon", "İade formu ile destek kaydı aynı bilgileri istiyor.", ["Tekrarlanan alanları kaldır.", "İade durumunu tek ekranda göster.", "Yeni akışı 10 siparişle dene."], "İade başına destek talebinin azalması bekleniyor.", "Orta", "Ertelendi", 48],
+  ["a8", "Yeni başlayanlara ekip arkadaşı eşleştir", "İlk ayındaki çalışanlar kime soru soracağını bilmiyor.", "calisan", "bilgi", "İnsan Kaynakları", "Karşılama programında günlük destek kişisi yok.", ["Her yeni başlayana bir ekip arkadaşı ata.", "İlk hafta için kısa görüşmeler planla.", "İkinci haftada geri bildirim topla."], "İşe uyum süresinin kısalması bekleniyor.", "Orta", "Tamamlandı", 31],
+  ["a9", "Destek yanıtlarında ortak dil kullan", "Müşteriler aynı soruya farklı yanıtlar alıyor.", "musteri", "uyari", "Müşteri Hizmetleri", "Güncel yanıt örnekleri ekip içinde paylaşılmıyor.", ["En sık 10 sorunun yanıtını yaz.", "Yanıtları ekip ile gözden geçir.", "Haftada 5 talebi birlikte değerlendir."], "Tekrar açılan taleplerde %10 azalma hedefleniyor.", "Yüksek", "Yapılacak", 89],
+  ["a10", "Satış ekibinin öğrenme saatini planla", "Ekip ürün güncellemelerini takip etmekte zorlanıyor.", "calisan", "bilgi", "Satış", "Yoğun müşteri takvimi öğrenmeye zaman bırakmıyor.", ["Haftada 30 dakika öğrenme saati ayır.", "Yeni ürünleri kısa örneklerle anlat.", "İki hafta sonra bilgi eksiklerini kontrol et."], "Ürün sorularının daha hızlı yanıtlanması bekleniyor.", "Düşük", "Ertelendi", 27],
 ];
+export const actionCards: ActionCard[] = actionSeed.map(([id, title, summary, source, severity, departman, neden, aksiyonlar, beklenenEtki, aciliyet, durum, count], i) => ({
+  id, title, summary, source, severity, departman, neden, aksiyonlar, beklenenEtki, aciliyet, durum,
+  status: durum === "Tamamlandı" ? "tamamlandi" : durum === "Ertelendi" ? "ertelendi" : durum === "DevamEdiyor" ? "devam" : "yeni",
+  createdAt: `2026-10-${19 - i}`, olusturmaTarihi: `2026-10-${19 - i}`, bulgu: summary, kaynak: source === "musteri" ? "Müşteri" : "Çalışan",
+  vadeTarihi: ["Yapılacak", "DevamEdiyor"].includes(durum) ? (i === 5 ? "2026-10-19" : "2026-10-28") : undefined,
+  ertelemeTarihi: durum === "Ertelendi" ? "2026-10-24" : undefined,
+  impactEstimate: id === "a1" ? 42500 : undefined,
+  nasilUretildi: { aciklama: "Son iki haftanın anonim geri bildirimleri önceki dönemle karşılaştırıldı; benzer temalar birlikte değerlendirildi.", veriNoktasiSayisi: count },
+}));
 
 export const sentimentSeries: SentimentPoint[] = Array.from({ length: 8 }, (_, i) => ({
   date: `2026-0${(i % 9) + 1}-01`,
@@ -305,3 +311,21 @@ export const pulseDepartments: RawDepartmentPulse[] = [
     trend: wave(50, 3, 0), risk: "orta", riskReasons: [], themes: [], quotes: [],
   },
 ];
+
+export const appSettings: AppSettings = {
+  language: "tr", currency: "TRY", currentUserId: "u1",
+  company: { ad: "Demo Şirket A.Ş.", vergiNo: "1234567890", sektor: "E-ticaret", calisanAraligi: "26–50", adres: "Maslak Mah. Büyükdere Cad. No:10, Sarıyer / İstanbul", logo: "" },
+  departments: [...departments.map(d => ({ id: d.id, ad: d.name, yonetici: ({ d1: "Ayşe Yılmaz", d2: "Mert Demir", d3: "Mehmet Kaya", d4: "Selin Ak", d5: "Ece Yıldız" } as Record<string, string>)[d.id] ?? "Deniz", calisanSayisi: d.headcount })), { id: "d6", ad: "İnsan Kaynakları", yonetici: "Deniz", calisanSayisi: 0 }],
+  users: [
+    { id: "u1", ad: "Deniz", email: "deniz@ornek.com.tr", rol: "Sahip", sonGiris: "2026-10-21T08:30:00", durum: "Aktif" },
+    { id: "u2", ad: "Ece Yıldız", email: "ece@ornek.com.tr", rol: "İK Yöneticisi", sonGiris: "2026-10-20T14:10:00", durum: "Aktif" },
+    { id: "u3", ad: "Mert Demir", email: "mert@ornek.com.tr", rol: "Departman Yöneticisi", departmentId: "d2", sonGiris: "2026-10-21T07:45:00", durum: "Aktif" },
+    { id: "u4", ad: "Davetli kullanıcı", email: "rapor@ornek.com.tr", rol: "Salt Okunur", durum: "Davet Bekliyor" },
+    { id: "u5", ad: "Can Ak", email: "can@ornek.com.tr", rol: "Salt Okunur", sonGiris: "2026-09-10T09:00:00", durum: "Pasif" },
+  ],
+  notifications: { email: true, inApp: true, slack: false, critical: true, resignation: true, onboarding: true, actionDue: true, weekly: true, day: "Pazartesi", time: "09:00", quietEnabled: true, quietStart: "20:00", quietEnd: "08:00" },
+  privacy: { anonymityThreshold: 5, rawRetention: 30, documentRetention: 3650, employeeRetention: 3650, notice: "Örnek aydınlatma metni: Çalışan ve müşteri geri bildirimleri, süreçlerin iyileştirilmesi amacıyla anonim olarak değerlendirilir. Özel mesajlar okunmaz. İlgili kişi hakları için şirketin KVKK sorumlusuna başvurabilirsiniz. Bu metin hukuk incelemesi gerektiren bir taslaktır.", deletionRequested: false },
+  appearance: { theme: "sistem", density: "rahat" },
+  security: { twoFactor: false, sessions: [ { id: "s1", device: "Chrome · Bu cihaz", location: "İstanbul", at: "2026-10-21T08:30:00", current: true }, { id: "s2", device: "Safari · iPhone", location: "İstanbul", at: "2026-10-20T19:30:00", current: false }, { id: "s3", device: "Edge · Windows", location: "Ankara", at: "2026-10-19T11:00:00", current: false } ], audit: Array.from({ length: 12 }, (_, i) => ({ id: `log${i}`, kim: i % 4 < 3 ? (i % 2 === 0 ? "Deniz" : "Ece Yıldız") : "Mert Demir", islem: ["TC kimlik görüntüleme", "IBAN görüntüleme", "Belge indirme", "Bildirim tercihleri güncelleme"][i % 4] ?? "Oturum açma", kategori: ["Hassas veri", "Hassas veri", "Belge", "Ayarlar"][i % 4] ?? "Ayarlar", at: new Date(Date.UTC(2026, 9, 21 - i, 8, 30)).toISOString() })) },
+  plan: { name: "Büyüme", monthly: 2490, usage: [ { label: "Çalışan", used: 49, limit: 100 }, { label: "Kullanıcı", used: 5, limit: 15 }, { label: "Aylık yorum", used: 3240, limit: 10000 }, { label: "Belge alanı (GB)", used: 2, limit: 10 } ], invoices: [ { id: "FTR-2026-010", at: "2026-10-01", amount: 2490, status: "Ödendi" }, { id: "FTR-2026-009", at: "2026-09-01", amount: 2490, status: "Ödendi" }, { id: "FTR-2026-008", at: "2026-08-01", amount: 2490, status: "Ödendi" } ] },
+};

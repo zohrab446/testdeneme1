@@ -1,3 +1,8 @@
+# Aksiyon Danışmanı ve Ayarlar
+- [x] Aksiyon Danışmanı: 10 kart, filtreler, durum işlemleri ve kanban.
+- [x] Ayarlar: 8 dolu sekme, formlar, korumalar ve bellekte kayıt.
+- [x] Yeni sayfaların kural testleri, sürükle-bırak ve tarayıcı doğrulaması.
+
 # Dashboard
 - [x] Dashboard’a özel dönem verileri ve bağımsız widget durumları.
 - [x] Karşılama, kurulum, KPI’lar, grafikler ve iş akışı kısayolları.

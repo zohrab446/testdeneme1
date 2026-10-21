@@ -141,13 +141,27 @@ export interface CreateEmployeeInviteInput {
   startDate: ISODate;
 }
 
+export type ActionStatus = "Öneri" | "Ertelendi" | "Yapılacak" | "DevamEdiyor" | "Tamamlandı";
+export type ActionUrgency = "Düşük" | "Orta" | "Yüksek" | "Kritik";
 export interface ActionCard {
   id: ID;
   title: string;
   summary: string;
   source: "calisan" | "musteri" | "karma";
   severity: Severity;
-  impactEstimate?: number; // ₺
+  bulgu?: string;
+  neden?: string;
+  aksiyonlar?: string[];
+  beklenenEtki?: string;
+  aciliyet?: ActionUrgency;
+  kaynak?: "Çalışan" | "Müşteri";
+  departman?: string;
+  durum?: ActionStatus;
+  vadeTarihi?: ISODate | undefined;
+  ertelemeTarihi?: ISODate | undefined;
+  olusturmaTarihi?: ISODate;
+  nasilUretildi?: { aciklama: string; veriNoktasiSayisi: number };
+  impactEstimate?: number | undefined; // ₺
   status: "yeni" | "devam" | "tamamlandi" | "ertelendi";
   createdAt: ISODate;
 }
@@ -302,3 +316,5 @@ export interface DashboardWidgets {
   dates: DashboardDate[];
 }
 export interface DashboardTask { id: string; actionId: string; title: string; createdAt: ISODate }
+
+export type AdvisorAction = ActionCard & Required<Pick<ActionCard, "bulgu" | "neden" | "aksiyonlar" | "beklenenEtki" | "aciliyet" | "kaynak" | "departman" | "durum" | "olusturmaTarihi" | "nasilUretildi">>;

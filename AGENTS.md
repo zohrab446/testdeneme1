@@ -10,6 +10,8 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
+- Actions and settings share in-memory data in `src/mocks/data.ts` through `src/services/index.ts`; extended action fields preserve legacy consumers through service normalization.
+- Settings tab URLs use an un-nested parameter route to preserve the existing settings URL and shell; dirty forms use router navigation blocking.
 - Components never import `src/mocks`; they call async functions in `src/services` — so switching to a real backend only touches services.
 - Shared domain types live in `src/types` — single source of truth for services and UI.
 - Pages use `PageScaffold` for loading/empty/error states; Dashboard uses independently queried, error-bounded widgets so one failed section cannot hide the others. `?durum=hata|bos` forces mock states; Dashboard supports `widget=<widgetId>` for an isolated error.
