@@ -68,11 +68,45 @@ export interface DataTransferItem {
 }
 
 export interface OnboardingDetails {
-  personal: { birthDate: ISODate; birthPlace: string; gender: string; maritalStatus: string; tckn: string };
-  contact: { phone: string; email: string; address: string; city: string };
-  education: { school: string; degree: string; graduationYear: number; previousEmployer: string };
+  personal: {
+    fullName?: string | undefined;
+    birthDate: ISODate;
+    birthPlace: string;
+    gender: string;
+    maritalStatus: string;
+    tckn: string;
+    motherName?: string | undefined;
+    fatherName?: string | undefined;
+    nationality?: string | undefined;
+  };
+  contact: {
+    phone: string;
+    email: string;
+    address: string;
+    city: string;
+    district?: string | undefined;
+    neighborhood?: string | undefined;
+  };
+  education: {
+    school: string;
+    degree: string;
+    graduationYear: number;
+    previousEmployer: string;
+    previouslyInsured?: string | undefined;
+    military?: string | undefined;
+  };
   bank: { bankName: string; iban: string };
   emergency: { name: string; relation: string; phone: string };
+}
+
+export interface CompanyProfile {
+  name: string;
+  kvkkContact: string;
+}
+
+export interface SubmitOnboardingInput {
+  details: OnboardingDetails;
+  documents: OnboardingDocument[];
 }
 
 export interface CorrectionRequest {
