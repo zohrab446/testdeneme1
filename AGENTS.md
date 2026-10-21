@@ -15,3 +15,4 @@
 - Pages use `PageScaffold` for loading/empty/error states; `?durum=hata|bos` forces mock error/empty — consistent state handling.
 - Layout is chosen in `__root.tsx` by pathname: `/karsilama/*` uses PublicShell, everything else AppShell — public route stays chrome-free.
 - Number/date/currency formatting goes through `src/lib/format.ts` (tr-TR) — consistent Turkish locale.
+- Employee welcome form step `hrLabel`s must match the HR correction section labels, and document slot ids match `OnboardingDocument.id` — correction mode unlocks only flagged steps/docs by these keys.
