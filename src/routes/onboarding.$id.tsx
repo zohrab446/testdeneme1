@@ -193,21 +193,26 @@ function Detail() {
                 <Row label="Doğum yeri">{d.personal.birthPlace}</Row>
                 <Row label="Cinsiyet">{d.personal.gender}</Row>
                 <Row label="Medeni durum">{d.personal.maritalStatus}</Row>
+                <Row label="Anne / baba adı">{d.personal.motherName ?? "—"} / {d.personal.fatherName ?? "—"}</Row>
+                <Row label="Uyruk">{d.personal.nationality ?? "—"}</Row>
               </Section>
               <Section title="İletişim" flagged={flagged.has("İletişim")}>
                 <Row label="Telefon">{d.contact.phone}</Row>
                 <Row label="E-posta">{d.contact.email}</Row>
                 <Row label="Adres">{d.contact.address}</Row>
-                <Row label="Şehir">{d.contact.city}</Row>
+                <Row label="İl / ilçe">{d.contact.city}{d.contact.district ? ` / ${d.contact.district}` : ""}</Row>
+                {d.contact.neighborhood && <Row label="Mahalle">{d.contact.neighborhood}</Row>}
               </Section>
               <Section title="Eğitim / Çalışma" flagged={flagged.has("Eğitim/Çalışma")}>
                 <Row label="Okul">{d.education.school}</Row>
                 <Row label="Bölüm / derece">{d.education.degree}</Row>
                 <Row label="Mezuniyet">{d.education.graduationYear}</Row>
-                <Row label="Önceki işveren">{d.education.previousEmployer}</Row>
+                {d.education.previousEmployer && <Row label="Önceki işveren">{d.education.previousEmployer}</Row>}
+                {d.education.previouslyInsured && <Row label="Önceki SGK">{d.education.previouslyInsured}</Row>}
+                {d.education.military && <Row label="Askerlik">{d.education.military}</Row>}
               </Section>
               <Section title="Banka" flagged={flagged.has("Banka")}>
-                <Row label="Banka">{d.bank.bankName}</Row>
+                {d.bank.bankName && <Row label="Banka">{d.bank.bankName}</Row>}
                 <Row label="IBAN"><SensitiveField value={d.bank.iban} /></Row>
               </Section>
               <Section title="Acil Durum" flagged={flagged.has("Acil Durum")}>
