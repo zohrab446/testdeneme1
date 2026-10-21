@@ -84,7 +84,7 @@ function VocPage() {
 
   const exportCsv = () => {
     const rows = data.data?.reviews ?? [];
-    if (!rows.length) return toast.error("İndirilecek yorum yok.");
+    if (!rows.length) { toast.error("İndirilecek yorum yok."); return; }
     downloadBlob(new Blob([reviewsToCsv(rows, (id) => SOURCE_NAMES[id as VocSourceId], formatDate)], { type: "text/csv;charset=utf-8" }), `musteri-sesi-${formatDate(new Date()).replace(/\./g, "-")}.csv`);
     toast.success(`${formatNumber(rows.length)} yorum indirildi`);
   };

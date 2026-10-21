@@ -70,7 +70,7 @@ export const customerReviews: CustomerReview[] = Array.from({ length: 260 }, (_,
   // Kargo şikâyetleri son haftalarda artıyor
   const negBias = topic === "kargo" ? 0.45 + (84 - daysAgo) / 84 * 0.3 : source === "sikayetvar" ? 0.85 : 0.4;
   const r = rnd();
-  const sentiment = r < negBias ? "olumsuz" : r < negBias + 0.2 ? "notr" : "olumlu";
+  const sentiment: CustomerReview["sentiment"] = r < negBias ? "olumsuz" : r < negBias + 0.2 ? "notr" : "olumlu";
   if (source === "appstore" && topic !== "uygulama" && rnd() < 0.5) topic = "uygulama";
   let text = pick(texts[topic][sentiment]);
   if (i % 17 === 0) text += ` Bana ${pick(phones)} numarasından dönün.`;
