@@ -23,8 +23,8 @@ export function PageHeader({
   actions,
 }: {
   title: string;
-  description?: string;
-  actions?: ReactNode;
+  description?: string | undefined;
+  actions?: ReactNode | undefined;
 }) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -45,8 +45,8 @@ export function KpiCard({
 }: {
   label: string;
   value: string;
-  delta?: number;
-  icon?: LucideIcon;
+  delta?: number | undefined;
+  icon?: LucideIcon | undefined;
 }) {
   const up = (delta ?? 0) >= 0;
   return (
@@ -106,10 +106,10 @@ export function EmptyState({
   description,
   action,
 }: {
-  icon?: LucideIcon;
+  icon?: LucideIcon | undefined;
   title: string;
-  description?: string;
-  action?: ReactNode;
+  description?: string | undefined;
+  action?: ReactNode | undefined;
 }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-card/50 px-6 py-16 text-center">
@@ -129,8 +129,8 @@ export function ErrorState({
   message = "Veriler yüklenirken bir sorun oluştu.",
   onRetry,
 }: {
-  message?: string;
-  onRetry?: () => void;
+  message?: string | undefined;
+  onRetry?: () => void | undefined;
 }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-destructive/30 bg-destructive/5 px-6 py-16 text-center">
@@ -174,10 +174,10 @@ export function ConfirmDialog({
   open: boolean;
   onOpenChange: (o: boolean) => void;
   title: string;
-  description?: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  destructive?: boolean;
+  description?: string | undefined;
+  confirmLabel?: string | undefined;
+  cancelLabel?: string | undefined;
+  destructive?: boolean | undefined;
   onConfirm: () => void;
 }) {
   return (

@@ -23,8 +23,8 @@ export function PageScaffold<T>({
   children,
 }: {
   title: string;
-  description?: string;
-  icon?: LucideIcon;
+  description?: string | undefined;
+  icon?: LucideIcon | undefined;
   queryKey: unknown[];
   queryFn: () => Promise<T>;
   emptyTitle?: string;
