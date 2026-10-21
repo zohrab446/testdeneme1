@@ -2,7 +2,7 @@ import type { DashboardAlert, DashboardDate, DashboardObservation, DashboardTask
 
 export const dashboardUpdatedAt = "2026-10-21T10:35:00Z";
 export const dashboardObservations: DashboardObservation[] = Array.from({ length: 180 }, (_, i) => {
-  const at = new Date(Date.UTC(2026, 4, 25 + i, 10));
+  const at = new Date(Date.UTC(2026, 3, 25 + i, 10));
   return {
     at: at.toISOString(),
     happiness: Math.round(63 + i * 0.055 + Math.sin(i / 11) * 4),
