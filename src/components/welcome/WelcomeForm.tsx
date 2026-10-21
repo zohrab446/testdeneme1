@@ -138,7 +138,8 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
   const base = emptyValues(invite.employeeName, invite.email);
   const form = useForm<WelcomeValues>({
     resolver: zodResolver(welcomeSchema),
-    mode: "onTouched",
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: invite.details ? fromDetails(invite.details, base) : base,
   });
   const { register, formState, getValues, setValue, watch, trigger } = form;
@@ -204,9 +205,7 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
   };
 
   const next = async () => {
-    console.log("NEXT start", step.id);
     const ok = step.id === "belgeler" ? validateDocs() : await trigger(step.fields, { shouldFocus: true });
-    console.log("NEXT", ok, Object.keys(form.formState.errors).join(","));
     if (ok) goTo(stepIndex + 1);
   };
 
@@ -254,7 +253,7 @@ export function WelcomeForm({ invite, company }: { invite: OnboardingInvite; com
   const sel = (name: keyof WelcomeValues) => ({
     value: (watch(name) as string | undefined) ?? "",
     onChange: (val: string) => setValue(name, val, { shouldValidate: !!errors[name], shouldDirty: true }),
-    onBlur: () => void (errors[name] && trigger(name)),
+    onBlur: () => undefined,
   });
 
   const phoneReg = (name: "phone" | "emergencyPhone") => {
