@@ -1,7 +1,6 @@
 import * as db from "@/mocks/data";
 import type {
   ActionCard,
-  CustomerReview,
   DashboardSummary,
   Department,
   Employee,
@@ -18,8 +17,6 @@ export const getActionCards = (): Promise<ActionCard[]> => mockResponse(db.actio
 export const getSentimentSeries = (): Promise<SentimentPoint[]> =>
   mockResponse(db.sentimentSeries, []);
 
-export const getCustomerReviews = (): Promise<CustomerReview[]> =>
-  mockResponse(db.customerReviews, []);
 
 export const getEmployees = (): Promise<Employee[]> => mockResponse(db.employees, []);
 
@@ -33,3 +30,4 @@ export const getSettings = () =>
   mockResponse<Record<string, unknown> | null>({ language: "tr", currency: "TRY" }, null);
 
 export * from "./pulse";
+export * from "./voc";
