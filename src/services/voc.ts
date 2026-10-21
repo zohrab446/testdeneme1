@@ -48,9 +48,9 @@ export async function askVoc(question: string): Promise<VocAskResult> {
   } else if (key === "kargo") {
     const k = all.filter((r) => r.topic === "kargo");
     const kn = k.filter((r) => r.sentiment === "olumsuz");
-    const recent = kn.filter((r) => Date.now() - new Date(r.createdAt).getTime() < 28 * 864e5 + 30 * 864e5).length;
+    const recent = kn.filter((r) => new Date("2026-10-20").getTime() - new Date(r.createdAt).getTime() < 28 * 864e5).length;
     a = { ...base, finding: "Evet. Kargo/teslimat kaynaklı olumsuz yorumlar son haftalarda belirgin şekilde artıyor.",
-      stats: [{ label: "Kargo yorumları", value: formatNumber(k.length) }, { label: "Olumsuz oranı", value: pct(kn.length, k.length) }, { label: "Son dönem olumsuz", value: formatNumber(recent) }],
+      stats: [{ label: "Kargo yorumları", value: formatNumber(k.length) }, { label: "Olumsuz oranı", value: pct(kn.length, k.length) }, { label: "Son 4 haftada olumsuz", value: formatNumber(recent) }],
       samples: samples((r) => r.topic === "kargo" && r.sentiment === "olumsuz"),
       action: { title: "Kargo firmasıyla SLA görüşmesi yap", summary: "Geciken teslimatlar için alternatif kargo ve proaktif bilgilendirme SMS'i planla.", severity: "kritik" } };
   } else if (key === "uygulama") {
