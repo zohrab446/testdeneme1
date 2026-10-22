@@ -133,6 +133,11 @@ export const startSlackOAuth = createServerFn({ method: "POST" })
     if (process.env["SLACK_API_KEY"]) {
       const channels = await listSlackChannelsGateway();
       if (!channels.length) throw new Error("Slack çalışma alanında herkese açık kanal bulunamadı.");
+      // Kullanıcı kanal seçtiyse yalnızca izin verilen listedekiler kabul edilir
+      const selected = data.channels?.length
+        ? channels.filter((c) => data.channels!.includes(c.id)).map((c) => c.id)
+        : channels.map((c) => c.id);
+      if (!selected.length) throw new Error("En az bir kanal seçin.");
       await supabaseAdmin.from("integrations").upsert(
         {
           company_id: ctx.companyId,
@@ -140,7 +145,7 @@ export const startSlackOAuth = createServerFn({ method: "POST" })
           status: "bagli",
           auth_type: "connector",
           scopes: ["channels:read", "channels:history"],
-          config: JSON.parse(JSON.stringify({ available_channels: channels, channels: channels.map((c) => c.id) })),
+          config: JSON.parse(JSON.stringify({ available_channels: channels, channels: selected })),
           error_code: null,
           error_message: null,
           consecutive_failures: 0,
