@@ -73,7 +73,7 @@ export function listSlackWorkspaceChannels(): Promise<{ id: string; name: string
 
 /** Slack bağlantısı: gateway bağlantısı varsa doğrudan bağlanır, yoksa OAuth URL'si döner (yalnızca gerçek mod). */
 export async function startSlackConnection(consent: boolean, channels?: string[]): Promise<{ url: string | null; connected: boolean }> {
-  return startSlackOAuth({ data: { consent, origin: window.location.origin, channels } });
+  return startSlackOAuth({ data: { consent, origin: window.location.origin, ...(channels ? { channels } : {}) } });
 }
 
 /** CSV içe aktarım (yalnızca gerçek mod). */
