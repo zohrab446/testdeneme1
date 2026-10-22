@@ -209,12 +209,18 @@ export async function runSync(integrationId: string): Promise<{ fetched: number 
         })),
       );
     } else if (row.provider === "slack") {
-      const token = await readSecret(admin, row.id, "access_token");
-      if (!token) throw new IntegrationError("SLACK_TOKEN_REVOKED");
       const channels = (row.config["channels"] as string[] | undefined) ?? [];
       if (!channels.length) throw new IntegrationError("NOT_CONNECTED");
       const since = row.last_sync_at ? String(new Date(row.last_sync_at).getTime() / 1000) : undefined;
-      const byChannel = await fetchSlackMessages(token, channels, since);
+      const isConnector = row.config["auth_type"] === "connector" || !!process.env["SLACK_API_KEY"];
+      let byChannel: { channel: string; messages: { ts: string; text: string; user?: string | undefined }[] }[];
+      if (isConnector) {
+        byChannel = await fetchSlackMessagesGateway(channels, since);
+      } else {
+        const token = await readSecret(admin, row.id, "access_token");
+        if (!token) throw new IntegrationError("SLACK_TOKEN_REVOKED");
+        byChannel = await fetchSlackMessages(token, channels, since);
+      }
       const items = byChannel.flatMap(({ channel, messages }) =>
         messages.map((m) => ({
           externalId: `${channel}-${m.ts}`,

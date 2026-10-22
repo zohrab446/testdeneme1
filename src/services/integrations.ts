@@ -65,10 +65,9 @@ export function connectTrendyolIntegration(input: { sellerId: string; apiKey: st
   return connectTrendyolFn({ data: input });
 }
 
-/** Slack OAuth başlatma: dönen URL'ye yönlendirin (yalnızca gerçek mod). */
-export async function startSlackConnection(consent: boolean): Promise<string> {
-  const { url } = await startSlackOAuth({ data: { consent, origin: window.location.origin } });
-  return url;
+/** Slack bağlantısı: gateway bağlantısı varsa doğrudan bağlanır, yoksa OAuth URL'si döner (yalnızca gerçek mod). */
+export async function startSlackConnection(consent: boolean): Promise<{ url: string | null; connected: boolean }> {
+  return startSlackOAuth({ data: { consent, origin: window.location.origin } });
 }
 
 /** CSV içe aktarım (yalnızca gerçek mod). */
