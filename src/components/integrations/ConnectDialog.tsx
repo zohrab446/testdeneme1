@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, CircleCheck, Loader2, PlugZap, RotateCw, ShieldCheck, Upload } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   connectTrendyolIntegration,
   importCsvIntegration,
+  listSlackWorkspaceChannels,
   startSlackConnection,
   testIntegrationConnection,
   USE_MOCKS,
@@ -38,12 +39,29 @@ export function ConnectDialog({ source, onClose }: { source: IntegrationConnecti
   const isSlack = source.id === "slack";
   const isDosya = source.id === "dosya";
 
+  // Gerçek Slack bağlantısında, bağlanmadan önce çalışma alanının kanallarını getir
+  const [workspaceChannels, setWorkspaceChannels] = useState<{ id: string; name: string }[]>(source.channels);
+  const [channelsLoading, setChannelsLoading] = useState(false);
+  const [channelsError, setChannelsError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!real || !isSlack || source.channels.length) return;
+    let cancelled = false;
+    setChannelsLoading(true);
+    listSlackWorkspaceChannels()
+      .then((list) => { if (!cancelled) { setWorkspaceChannels(list); setSelected(list.map((c) => c.id)); } })
+      .catch((e: unknown) => { if (!cancelled) setChannelsError(e instanceof Error ? e.message : "Kanallar alınamadı."); })
+      .finally(() => { if (!cancelled) setChannelsLoading(false); });
+    return () => { cancelled = true; };
+  }, [real, isSlack, source.channels.length]);
+
+  const channelSource = real && isSlack ? { ...source, channels: workspaceChannels } : source;
+
   const test = useMutation({
     mutationFn: async () => {
       if (!real) return testIntegrationConnection(source.id, consent, selected);
       if (isTrendyol) return connectTrendyolIntegration({ sellerId, apiKey, apiSecret, consent });
       if (isSlack) {
-        const result = await startSlackConnection(consent);
+        const result = await startSlackConnection(consent, selected);
         if (result.url) {
           window.location.href = result.url; // Slack yetkilendirme sayfasına yönlendir
           return new Promise(() => {}); // yönlendirme bitene kadar bekle
@@ -64,6 +82,7 @@ export function ConnectDialog({ source, onClose }: { source: IntegrationConnecti
 
   const step0Ready = real && isTrendyol ? !!(sellerId.trim() && apiKey.trim() && apiSecret.trim())
     : real && isDosya ? !!(csvText && csvTextColumn.trim())
+    : real && isSlack ? !channelsLoading && !channelsError && selected.length > 0
     : !(source.channels.length > 0 && !selected.length);
 
   return <Dialog open onOpenChange={open => { if (!open && !test.isPending) onClose(); }}>
@@ -102,8 +121,10 @@ export function ConnectDialog({ source, onClose }: { source: IntegrationConnecti
               <div className="space-y-2"><Label htmlFor="csv-date-col">Tarih sütunu</Label><Input id="csv-date-col" value={csvDateColumn} onChange={e => setCsvDateColumn(e.target.value)} placeholder="tarih" /></div>
             </div>
           </section>}
-          {!isDosya && <ChannelSelection source={source} selected={selected} onChange={setSelected} />}
-          {source.channels.length > 0 && selected.length === 0 && !(real && isTrendyol) && <p className="text-sm text-muted-foreground">Devam etmek için en az bir kanal seçin.</p>}
+          {real && isSlack && channelsLoading && <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" />Slack çalışma alanınızdaki kanallar getiriliyor…</p>}
+          {real && isSlack && channelsError && <p role="alert" className="text-sm text-destructive">{channelsError}</p>}
+          {!isDosya && <ChannelSelection source={channelSource} selected={selected} onChange={setSelected} />}
+          {channelSource.channels.length > 0 && selected.length === 0 && !(real && isTrendyol) && <p className="text-sm text-muted-foreground">Devam etmek için en az bir kanal seçin.</p>}
           {source.id === "sgk" && <p className="text-sm text-muted-foreground">Resmî SGK bildirimi e-SGK üzerinden yapılır; bu adım veriyi hazırlar.</p>}
         </>}
         {step === 1 && <>

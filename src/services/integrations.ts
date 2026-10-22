@@ -8,6 +8,7 @@ import {
   disconnectIntegrationFn,
   importCsvFn,
   listIntegrationCatalog,
+  listSlackChannelsFn,
   saveIntegrationSettingsFn,
   startSlackOAuth,
   syncIntegrationNow,
@@ -65,9 +66,14 @@ export function connectTrendyolIntegration(input: { sellerId: string; apiKey: st
   return connectTrendyolFn({ data: input });
 }
 
+/** Bağlanmadan önce Slack çalışma alanındaki herkese açık kanalları listeler (yalnızca gerçek mod). */
+export function listSlackWorkspaceChannels(): Promise<{ id: string; name: string }[]> {
+  return listSlackChannelsFn();
+}
+
 /** Slack bağlantısı: gateway bağlantısı varsa doğrudan bağlanır, yoksa OAuth URL'si döner (yalnızca gerçek mod). */
-export async function startSlackConnection(consent: boolean): Promise<{ url: string | null; connected: boolean }> {
-  return startSlackOAuth({ data: { consent, origin: window.location.origin } });
+export async function startSlackConnection(consent: boolean, channels?: string[]): Promise<{ url: string | null; connected: boolean }> {
+  return startSlackOAuth({ data: { consent, origin: window.location.origin, ...(channels ? { channels } : {}) } });
 }
 
 /** CSV içe aktarım (yalnızca gerçek mod). */
