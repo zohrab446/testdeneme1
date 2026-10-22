@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Loader2, RotateCw, Save, X } from "lucide-react";
+import { Check, Loader2, RefreshCw, RotateCw, Save, X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "@/components/common";
 import { integrationStatuses, syncFrequencies } from "@/lib/integrations";
 import { formatDateTime, formatNumber } from "@/lib/format";
-import { saveIntegrationSettings } from "@/services/integrations";
+import { saveIntegrationSettings, syncIntegration } from "@/services/integrations";
 import type { IntegrationConnection, SyncFrequency } from "@/types/integrations";
 import { ChannelSelection } from "./ChannelSelection";
 
@@ -20,11 +20,14 @@ export function ManageSheet({ source, onClose, onReconnect, onDisconnect }: {
   const [selected, setSelected] = useState(source.selectedChannels);
   const client = useQueryClient();
   const save = useMutation({ mutationFn: () => saveIntegrationSettings(source.id, frequency, selected),
-    onSuccess: updated => {
-      client.setQueryData<IntegrationConnection[]>(["integration-catalog"], current => current?.map(item => item.id === updated.id ? updated : item));
+    onSuccess: () => {
       toast.success("Senkron ayarları kaydedildi.");
       void client.invalidateQueries({ queryKey: ["integration-catalog"] });
     },
+  });
+  const sync = useMutation({ mutationFn: () => syncIntegration(source.id),
+    onSuccess: result => { toast.success(`Senkron tamamlandı: ${formatNumber(result.fetched)} kayıt alındı.`); void client.invalidateQueries({ queryKey: ["integration-catalog"] }); },
+    onError: error => toast.error(error.message),
   });
   const status = integrationStatuses[source.status];
   return <Sheet open onOpenChange={open => { if (!open && !save.isPending) onClose(); }}>
