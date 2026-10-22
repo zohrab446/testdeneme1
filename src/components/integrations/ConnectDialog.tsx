@@ -43,9 +43,12 @@ export function ConnectDialog({ source, onClose }: { source: IntegrationConnecti
       if (!real) return testIntegrationConnection(source.id, consent, selected);
       if (isTrendyol) return connectTrendyolIntegration({ sellerId, apiKey, apiSecret, consent });
       if (isSlack) {
-        const url = await startSlackConnection(consent);
-        window.location.href = url; // Slack yetkilendirme sayfasına yönlendir
-        return new Promise(() => {}); // yönlendirme bitene kadar bekle
+        const result = await startSlackConnection(consent);
+        if (result.url) {
+          window.location.href = result.url; // Slack yetkilendirme sayfasına yönlendir
+          return new Promise(() => {}); // yönlendirme bitene kadar bekle
+        }
+        return result; // Gateway bağlantısı: doğrudan bağlandı
       }
       if (isDosya) {
         const result = await importCsvIntegration({ content: csvText, mapping: { text: csvTextColumn, date: csvDateColumn }, source: "csv", consent });
