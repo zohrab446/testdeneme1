@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AksiyonlarRouteImport } from './routes/aksiyonlar'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AyarlarRouteImport } from './routes/ayarlar'
 import { Route as CalisanNabziRouteImport } from './routes/calisan-nabzi'
 import { Route as EntegrasyonlarRouteImport } from './routes/entegrasyonlar'
@@ -30,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const AksiyonlarRoute = AksiyonlarRouteImport.update({
   id: '/aksiyonlar',
   path: '/aksiyonlar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AyarlarRoute = AyarlarRouteImport.update({
@@ -88,6 +94,7 @@ const ApiPublicIntegrationsSlackCallbackRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aksiyonlar': typeof AksiyonlarRoute
+  '/auth': typeof AuthRoute
   '/ayarlar': typeof AyarlarRoute
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aksiyonlar': typeof AksiyonlarRoute
+  '/auth': typeof AuthRoute
   '/ayarlar': typeof AyarlarRoute
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aksiyonlar': typeof AksiyonlarRoute
+  '/auth': typeof AuthRoute
   '/ayarlar': typeof AyarlarRoute
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/aksiyonlar'
+    | '/auth'
     | '/ayarlar'
     | '/calisan-nabzi'
     | '/entegrasyonlar'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/aksiyonlar'
+    | '/auth'
     | '/ayarlar'
     | '/calisan-nabzi'
     | '/entegrasyonlar'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/aksiyonlar'
+    | '/auth'
     | '/ayarlar'
     | '/calisan-nabzi'
     | '/entegrasyonlar'
@@ -176,6 +188,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AksiyonlarRoute: typeof AksiyonlarRoute
+  AuthRoute: typeof AuthRoute
   AyarlarRoute: typeof AyarlarRoute
   CalisanNabziRoute: typeof CalisanNabziRoute
   EntegrasyonlarRoute: typeof EntegrasyonlarRoute
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/aksiyonlar'
       fullPath: '/aksiyonlar'
       preLoaderRoute: typeof AksiyonlarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ayarlar': {
@@ -280,6 +300,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AksiyonlarRoute: AksiyonlarRoute,
+  AuthRoute: AuthRoute,
   AyarlarRoute: AyarlarRoute,
   CalisanNabziRoute: CalisanNabziRoute,
   EntegrasyonlarRoute: EntegrasyonlarRoute,
