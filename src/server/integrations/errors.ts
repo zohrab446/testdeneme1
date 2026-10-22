@@ -21,7 +21,7 @@ export const integrationErrorMessages: Record<string, string> = {
 
 export class IntegrationError extends Error {
   constructor(public code: keyof typeof integrationErrorMessages | string) {
-    super(integrationErrorMessages[code] ?? integrationErrorMessages.UNKNOWN);
+    super(integrationErrorMessages[code] ?? integrationErrorMessages["UNKNOWN"]);
     this.name = "IntegrationError";
   }
 }
@@ -29,5 +29,5 @@ export class IntegrationError extends Error {
 export function toTurkishMessage(error: unknown): string {
   if (error instanceof IntegrationError) return error.message;
   if (error instanceof Error) return error.message;
-  return integrationErrorMessages.UNKNOWN;
+  return integrationErrorMessages["UNKNOWN"]!;
 }

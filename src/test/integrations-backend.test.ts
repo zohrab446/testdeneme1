@@ -66,13 +66,13 @@ describe("CSV içe aktarım", () => {
 
 describe("Hata kodu eşlemesi", () => {
   it("bilinen kodlar Türkçe mesaja çevrilir", () => {
-    expect(new IntegrationError("TRENDYOL_UNAUTHORIZED").message).toBe(integrationErrorMessages.TRENDYOL_UNAUTHORIZED);
+    expect(new IntegrationError("TRENDYOL_UNAUTHORIZED").message).toBe(integrationErrorMessages["TRENDYOL_UNAUTHORIZED"]);
     expect(new IntegrationError("SLACK_STATE_MISMATCH").message).toContain("Güvenlik");
   });
   it("bilinmeyen kod genel mesaja düşer", () => {
-    expect(new IntegrationError("BILINMEYEN").message).toBe(integrationErrorMessages.UNKNOWN);
+    expect(new IntegrationError("BILINMEYEN").message).toBe(integrationErrorMessages["UNKNOWN"]);
   });
   it("toTurkishMessage IntegrationError'ı korur", () => {
-    expect(toTurkishMessage(new IntegrationError("CONSENT_REQUIRED"))).toBe(integrationErrorMessages.CONSENT_REQUIRED);
+    expect(toTurkishMessage(new IntegrationError("CONSENT_REQUIRED"))).toBe(integrationErrorMessages["CONSENT_REQUIRED"]);
   });
 });

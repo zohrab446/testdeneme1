@@ -6,7 +6,7 @@ export const CSV_MAX_ROWS = 5000;
 export interface CsvMapping {
   text: string;
   date?: string;
-  author?: string;
+  author?: string | undefined;
   rating?: string;
 }
 
@@ -14,7 +14,7 @@ export interface CsvRow {
   externalId: string;
   text: string;
   createdAt: string;
-  author?: string;
+  author?: string | undefined;
 }
 
 export interface CsvImportResult {

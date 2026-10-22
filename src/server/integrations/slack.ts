@@ -58,10 +58,10 @@ export async function listSlackChannels(token: string): Promise<SlackChannel[]> 
   let cursor = "";
   do {
     const data = await slackFetch(token, "conversations.list", `limit=200&types=public_channel${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`);
-    for (const c of (data.channels as { id: string; name: string }[] | undefined) ?? []) {
+    for (const c of (data["channels"] as { id: string; name: string }[] | undefined) ?? []) {
       channels.push({ id: c.id, name: c.name });
     }
-    cursor = (data.response_metadata as { next_cursor?: string } | undefined)?.next_cursor ?? "";
+    cursor = (data["response_metadata"] as { next_cursor?: string } | undefined)?.next_cursor ?? "";
   } while (cursor);
   return channels;
 }
@@ -69,7 +69,7 @@ export async function listSlackChannels(token: string): Promise<SlackChannel[]> 
 export interface SlackMessage {
   ts: string;
   text: string;
-  user?: string;
+  user?: string | undefined;
 }
 
 /** Seçili kanallardan artımlı mesaj çeker; bot ve katılım/ayrılma olaylarını atlar. */
@@ -83,13 +83,13 @@ export async function fetchSlackMessages(token: string, channelIds: string[], si
       if (sinceTs) params.set("oldest", sinceTs);
       if (cursor) params.set("cursor", cursor);
       const data = await slackFetch(token, "conversations.history", params.toString());
-      for (const m of (data.messages as (SlackMessage & { subtype?: string; bot_id?: string })[] | undefined) ?? []) {
+      for (const m of (data["messages"] as (SlackMessage & { subtype?: string; bot_id?: string })[] | undefined) ?? []) {
         if (m.bot_id) continue; // bot mesajlarını atla
         if (m.subtype === "channel_join" || m.subtype === "channel_leave") continue; // katılım/ayrılma olaylarını atla
         if (!m.text?.trim()) continue;
         messages.push({ ts: m.ts, text: m.text, user: m.user });
       }
-      cursor = (data.response_metadata as { next_cursor?: string } | undefined)?.next_cursor ?? "";
+      cursor = (data["response_metadata"] as { next_cursor?: string } | undefined)?.next_cursor ?? "";
     } while (cursor);
     out.push({ channel, messages });
   }

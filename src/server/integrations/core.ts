@@ -121,7 +121,7 @@ async function ingestRawItems(
   admin: SupabaseClient,
   companyId: string,
   source: string,
-  items: { externalId: string; text: string; createdAt: string; author?: string }[],
+  items: { externalId: string; text: string; createdAt: string; author?: string | undefined }[],
 ): Promise<number> {
   let inserted = 0;
   for (const item of items) {
