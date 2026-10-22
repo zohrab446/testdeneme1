@@ -1,15 +1,39 @@
 import * as db from "@/mocks/data";
 import { computeAnalytics, filterReviews, maskName, maskPii, matchQuestion, SAMPLE_QUESTIONS, topicLabel } from "@/lib/voc";
 import { formatNumber, formatPercent } from "@/lib/format";
-import type { ActionCard, CustomerReview, VocAnalytics, VocAnswer, VocAskResult, VocFilter, VocSource } from "@/types";
+import type { ActionCard, CustomerReview, VocAnalytics, VocAnswer, VocAskResult, VocFilter, VocSource, VocSentiment, VocTopic } from "@/types";
 import { delay, mockResponse } from "./http";
+import { USE_MOCKS } from "./mode";
+import { getCompanyInsights, type InsightReview } from "./insights.functions";
 
 /** Kişisel veriler UI'a ulaşmadan burada maskelenir. */
 const sanitize = (r: CustomerReview): CustomerReview => ({ ...r, author: maskName(r.author), text: maskPii(r.text) });
 
 export const getVocSources = (): Promise<VocSource[]> => mockResponse(db.vocSources, []);
 
+const VOC_TOPICS: VocTopic[] = ["kargo", "fiyat", "kalite", "musteri_hizmetleri", "uygulama", "iade"];
+const toVocTopic = (topic: string | undefined): VocTopic => VOC_TOPICS.find((t) => t === topic) ?? "musteri_hizmetleri";
+const toVocSentiment = (s: InsightReview["sentiment"]): VocSentiment => (s === "pozitif" ? "olumlu" : s === "negatif" ? "olumsuz" : "notr");
+
+/** Gerçek mod: yorumlar raw_items'tan gelir (metinler yazılırken maskelenmiştir). */
+async function getVocDataReal(f: VocFilter): Promise<{ analytics: VocAnalytics; reviews: CustomerReview[] }> {
+  const insights = await getCompanyInsights();
+  const reviews: CustomerReview[] = insights.reviews.map((r) => ({
+    id: r.id,
+    source: (["trendyol", "sikayetvar", "google", "hepsiburada", "appstore", "csv"].includes(r.source) ? r.source : "csv") as CustomerReview["source"],
+    author: "Anonim",
+    rating: r.sentiment === "pozitif" ? 5 : r.sentiment === "negatif" ? 1 : 3,
+    text: r.text,
+    topic: toVocTopic(r.topics[0]),
+    sentiment: toVocSentiment(r.sentiment),
+    createdAt: r.createdAt,
+  }));
+  const filtered = filterReviews(reviews, f);
+  return { analytics: computeAnalytics(filtered, f), reviews: filtered };
+}
+
 export async function getVocData(f: VocFilter): Promise<{ analytics: VocAnalytics; reviews: CustomerReview[] }> {
+  if (!USE_MOCKS) return getVocDataReal(f);
   const reviews = filterReviews(db.customerReviews, f).map(sanitize);
   return mockResponse({ analytics: computeAnalytics(reviews, f), reviews }, { analytics: computeAnalytics([], f), reviews: [] });
 }
