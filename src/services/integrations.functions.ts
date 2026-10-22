@@ -142,10 +142,11 @@ export const saveIntegrationSettingsFn = createServerFn({ method: "POST" })
     if (!["saatlik", "gunluk", "haftalik"].includes(data.frequency)) throw new Error("Geçerli bir senkron sıklığı seçin.");
     const { data: row } = await supabase.from("integrations").select("id, config").eq("company_id", ctx.companyId).eq("provider", data.provider).maybeSingle();
     if (!row) throw new IntegrationError("NOT_CONNECTED");
-    const available = (row.config["available_channels"] as { id: string }[] | undefined) ?? [];
+    const config = (row.config ?? {}) as Record<string, unknown>;
+    const available = (config["available_channels"] as { id: string }[] | undefined) ?? [];
     if (available.length && data.channels.some((c) => !available.some((a) => a.id === c))) throw new Error("Yalnızca izin verilen kanallar seçilebilir.");
     if (available.length && !data.channels.length) throw new Error("En az bir kanal seçin.");
-    await supabase.from("integrations").update({ config: { ...row.config, frequency: data.frequency, channels: data.channels } }).eq("id", row.id);
+    await supabase.from("integrations").update({ config: { ...config, frequency: data.frequency, channels: data.channels } }).eq("id", row.id);
     await audit(ctx.companyId, userId, "integration_settings_saved", { provider: data.provider });
     return { ok: true };
   });
@@ -223,7 +224,7 @@ export const importCsvFn = createServerFn({ method: "POST" })
 export async function saveSlackChannels(integrationId: string, channels: { id: string; name: string }[]): Promise<void> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: row } = await supabaseAdmin.from("integrations").select("config").eq("id", integrationId).single();
-  await supabaseAdmin.from("integrations").update({ config: { ...(row?.config ?? {}), available_channels: channels, channels: channels.map((c) => c.id) } }).eq("id", integrationId);
+  await supabaseAdmin.from("integrations").update({ config: { ...((row?.config ?? {}) as Record<string, unknown>), available_channels: channels, channels: channels.map((c) => c.id) } }).eq("id", integrationId);
 }
 
 export { listSlackChannels };
