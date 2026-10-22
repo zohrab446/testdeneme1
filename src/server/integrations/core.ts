@@ -5,7 +5,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { IntegrationError } from "./errors";
 import { fetchTrendyolQuestions, testTrendyolConnection, TrendyolApiError, type TrendyolCredentials } from "./trendyol";
-import { fetchSlackMessages } from "./slack";
+import { fetchSlackMessages, fetchSlackMessagesGateway } from "./slack";
 import { analyzeTexts } from "./analyze";
 import { hashAuthor, maskPii } from "./pii";
 import { deleteSecrets, readSecret, storeSecret } from "./secrets";

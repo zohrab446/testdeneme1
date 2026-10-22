@@ -111,14 +111,42 @@ export const connectTrendyolFn = createServerFn({ method: "POST" })
 export const startSlackOAuth = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { consent: boolean; origin: string }) => input)
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<{ url: string | null; connected: boolean }> => {
     const { supabase, userId } = context;
     const ctx = await resolveCompany(supabase, userId);
     requireManagerRole(ctx);
     if (!data.consent) throw new IntegrationError("CONSENT_REQUIRED");
-    const clientId = process.env["SLACK_CLIENT_ID"];
-    if (!clientId) throw new Error("Slack bağlantısı henüz yapılandırılmadı (SLACK_CLIENT_ID eksik).");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Tercih 1: Lovable Slack bağlantısı (gateway) — OAuth uygulaması gerekmez
+    if (process.env["SLACK_API_KEY"]) {
+      const channels = await listSlackChannelsGateway();
+      if (!channels.length) throw new Error("Slack çalışma alanında herkese açık kanal bulunamadı.");
+      await supabaseAdmin.from("integrations").upsert(
+        {
+          company_id: ctx.companyId,
+          provider: "slack",
+          status: "bagli",
+          auth_type: "connector",
+          scopes: ["channels:read", "channels:history"],
+          config: JSON.parse(JSON.stringify({ available_channels: channels, channels: channels.map((c) => c.id) })),
+          error_code: null,
+          error_message: null,
+          consecutive_failures: 0,
+        },
+        { onConflict: "company_id,provider" },
+      );
+      await supabase.from("consents").upsert(
+        { company_id: ctx.companyId, user_id: userId, provider: "slack", policy_version: POLICY_VERSION },
+        { onConflict: "company_id,user_id,provider" },
+      );
+      await audit(ctx.companyId, userId, "integration_connected", { provider: "slack", via: "connector" });
+      return { url: null, connected: true };
+    }
+
+    // Tercih 2: özel Slack uygulaması ile OAuth v2
+    const clientId = process.env["SLACK_CLIENT_ID"];
+    if (!clientId) throw new Error("Slack bağlantısı henüz yapılandırılmadı.");
     const state = crypto.randomUUID();
     await supabaseAdmin.from("integrations").upsert(
       { company_id: ctx.companyId, provider: "slack", status: "bagli_degil", auth_type: "oauth", scopes: ["channels:read", "channels:history"], config: { oauth_state: state } },
@@ -129,7 +157,7 @@ export const startSlackOAuth = createServerFn({ method: "POST" })
       { onConflict: "company_id,user_id,provider" },
     );
     const redirectUri = `${data.origin}/api/public/integrations/slack/callback`;
-    return { url: slackAuthorizeUrl(clientId, redirectUri, state) };
+    return { url: slackAuthorizeUrl(clientId, redirectUri, state), connected: false };
   });
 
 export const saveIntegrationSettingsFn = createServerFn({ method: "POST" })
