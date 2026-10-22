@@ -39,12 +39,29 @@ export function ConnectDialog({ source, onClose }: { source: IntegrationConnecti
   const isSlack = source.id === "slack";
   const isDosya = source.id === "dosya";
 
+  // Gerçek Slack bağlantısında, bağlanmadan önce çalışma alanının kanallarını getir
+  const [workspaceChannels, setWorkspaceChannels] = useState<{ id: string; name: string }[]>(source.channels);
+  const [channelsLoading, setChannelsLoading] = useState(false);
+  const [channelsError, setChannelsError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!real || !isSlack || source.channels.length) return;
+    let cancelled = false;
+    setChannelsLoading(true);
+    listSlackWorkspaceChannels()
+      .then((list) => { if (!cancelled) { setWorkspaceChannels(list); setSelected(list.map((c) => c.id)); } })
+      .catch((e: unknown) => { if (!cancelled) setChannelsError(e instanceof Error ? e.message : "Kanallar alınamadı."); })
+      .finally(() => { if (!cancelled) setChannelsLoading(false); });
+    return () => { cancelled = true; };
+  }, [real, isSlack, source.channels.length]);
+
+  const channelSource = real && isSlack ? { ...source, channels: workspaceChannels } : source;
+
   const test = useMutation({
     mutationFn: async () => {
       if (!real) return testIntegrationConnection(source.id, consent, selected);
       if (isTrendyol) return connectTrendyolIntegration({ sellerId, apiKey, apiSecret, consent });
       if (isSlack) {
-        const result = await startSlackConnection(consent);
+        const result = await startSlackConnection(consent, selected);
         if (result.url) {
           window.location.href = result.url; // Slack yetkilendirme sayfasına yönlendir
           return new Promise(() => {}); // yönlendirme bitene kadar bekle
