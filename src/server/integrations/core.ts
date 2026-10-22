@@ -50,7 +50,7 @@ async function getAdmin() {
 
 export async function audit(companyId: string, actorId: string | null, action: string, detail: Record<string, unknown> = {}) {
   const admin = await getAdmin();
-  await admin.from("audit_log").insert({ company_id: companyId, actor_id: actorId, action, detail });
+  await admin.from("audit_log").insert({ company_id: companyId, actor_id: actorId, action, detail: JSON.parse(JSON.stringify(detail)) });
 }
 
 function mapTrendyolError(error: unknown): IntegrationError {
@@ -169,7 +169,7 @@ export async function runSync(integrationId: string): Promise<{ fetched: number 
 
   const { data: run } = await admin.from("sync_runs").insert({ integration_id: row.id }).select("id").single();
   const finish = async (status: "basarili" | "hata", fetched: number, error?: string) => {
-    if (run) await admin.from("sync_runs").update({ finished_at: new Date().toISOString(), status, records_fetched: fetched, error }).eq("id", run.id);
+    if (run) await admin.from("sync_runs").update({ finished_at: new Date().toISOString(), status, records_fetched: fetched, error: error ?? null }).eq("id", run.id);
     const failures = status === "hata" ? row.consecutive_failures + 1 : 0;
     await admin
       .from("integrations")

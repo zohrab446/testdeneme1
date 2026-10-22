@@ -44,7 +44,7 @@ export const Route = createFileRoute("/api/public/integrations/slack/callback")(
               error_code: null,
               error_message: null,
               consecutive_failures: 0,
-              config: { available_channels: channels, channels: channels.map((c) => c.id) },
+              config: JSON.parse(JSON.stringify({ available_channels: channels, channels: channels.map((c) => c.id) })),
             })
             .eq("id", integration.id);
           await supabaseAdmin.from("audit_log").insert({ company_id: integration.company_id, action: "integration_connected", detail: { provider: "slack" } });
