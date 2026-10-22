@@ -82,6 +82,7 @@ export function ConnectDialog({ source, onClose }: { source: IntegrationConnecti
 
   const step0Ready = real && isTrendyol ? !!(sellerId.trim() && apiKey.trim() && apiSecret.trim())
     : real && isDosya ? !!(csvText && csvTextColumn.trim())
+    : real && isSlack ? !channelsLoading && !channelsError && selected.length > 0
     : !(source.channels.length > 0 && !selected.length);
 
   return <Dialog open onOpenChange={open => { if (!open && !test.isPending) onClose(); }}>
@@ -120,8 +121,10 @@ export function ConnectDialog({ source, onClose }: { source: IntegrationConnecti
               <div className="space-y-2"><Label htmlFor="csv-date-col">Tarih sütunu</Label><Input id="csv-date-col" value={csvDateColumn} onChange={e => setCsvDateColumn(e.target.value)} placeholder="tarih" /></div>
             </div>
           </section>}
-          {!isDosya && <ChannelSelection source={source} selected={selected} onChange={setSelected} />}
-          {source.channels.length > 0 && selected.length === 0 && !(real && isTrendyol) && <p className="text-sm text-muted-foreground">Devam etmek için en az bir kanal seçin.</p>}
+          {real && isSlack && channelsLoading && <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" />Slack çalışma alanınızdaki kanallar getiriliyor…</p>}
+          {real && isSlack && channelsError && <p role="alert" className="text-sm text-destructive">{channelsError}</p>}
+          {!isDosya && <ChannelSelection source={channelSource} selected={selected} onChange={setSelected} />}
+          {channelSource.channels.length > 0 && selected.length === 0 && !(real && isTrendyol) && <p className="text-sm text-muted-foreground">Devam etmek için en az bir kanal seçin.</p>}
           {source.id === "sgk" && <p className="text-sm text-muted-foreground">Resmî SGK bildirimi e-SGK üzerinden yapılır; bu adım veriyi hazırlar.</p>}
         </>}
         {step === 1 && <>
