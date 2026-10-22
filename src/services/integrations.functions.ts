@@ -108,9 +108,20 @@ export const connectTrendyolFn = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Bağlanmadan önce çalışma alanındaki herkese açık kanalları listeler (kanal seçimi için). */
+export const listSlackChannelsFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ id: string; name: string }[]> => {
+    const { supabase, userId } = context;
+    const ctx = await resolveCompany(supabase, userId);
+    requireManagerRole(ctx);
+    if (!process.env["SLACK_API_KEY"]) throw new Error("Slack bağlantısı henüz yapılandırılmadı.");
+    return listSlackChannelsGateway();
+  });
+
 export const startSlackOAuth = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { consent: boolean; origin: string }) => input)
+  .inputValidator((input: { consent: boolean; origin: string; channels?: string[] }) => input)
   .handler(async ({ data, context }): Promise<{ url: string | null; connected: boolean }> => {
     const { supabase, userId } = context;
     const ctx = await resolveCompany(supabase, userId);
