@@ -1,7 +1,69 @@
 /**
- * Slack OAuth v2 + mesaj senkronu.
+ * Slack entegrasyonu: iki yol desteklenir.
+ * 1) Lovable Slack bağlantısı (tercih edilen): connector gateway üzerinden,
+ *    LOVABLE_API_KEY + SLACK_API_KEY ile. Kullanıcının uygulama oluşturması gerekmez.
+ * 2) Özel Slack uygulaması (OAuth v2): SLACK_CLIENT_ID/SECRET tanımlıysa.
  * Yalnızca herkese açık kanallar: özel mesajlar ve özel kanallar kapsam dışı.
  */
+
+const GATEWAY_URL = "https://connector-gateway.lovable.dev/slack/api";
+
+/** Gateway üzerinden Slack API çağrısı (sunucu tarafı). */
+async function slackGatewayFetch(method: string, query: string, attempt = 0): Promise<Record<string, unknown>> {
+  const lovableKey = process.env["LOVABLE_API_KEY"];
+  const connectionKey = process.env["SLACK_API_KEY"];
+  if (!lovableKey || !connectionKey) throw new Error("SLACK_NOT_LINKED");
+  const res = await fetch(`${GATEWAY_URL}/${method}${query ? `?${query}` : ""}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": connectionKey },
+  });
+  if (res.status === 429 && attempt < 4) {
+    const retryAfter = Number(res.headers.get("Retry-After") ?? "2");
+    await new Promise((r) => setTimeout(r, retryAfter * 1000));
+    return slackGatewayFetch(method, query, attempt + 1);
+  }
+  const data = (await res.json()) as Record<string, unknown> & { ok: boolean; error?: string };
+  if (!data.ok) throw new Error(`SLACK:${data.error ?? "unknown"}`);
+  return data;
+}
+
+/** Bağlı Slack çalışma alanının herkese açık kanallarını gateway üzerinden listeler. */
+export async function listSlackChannelsGateway(): Promise<SlackChannel[]> {
+  const channels: SlackChannel[] = [];
+  let cursor = "";
+  do {
+    const data = await slackGatewayFetch("conversations.list", `limit=200&types=public_channel${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`);
+    for (const c of (data["channels"] as { id: string; name: string }[] | undefined) ?? []) {
+      channels.push({ id: c.id, name: c.name });
+    }
+    cursor = (data["response_metadata"] as { next_cursor?: string } | undefined)?.next_cursor ?? "";
+  } while (cursor);
+  return channels;
+}
+
+/** Seçili kanallardan gateway üzerinden artımlı mesaj çeker. */
+export async function fetchSlackMessagesGateway(channelIds: string[], sinceTs?: string): Promise<{ channel: string; messages: SlackMessage[] }[]> {
+  const out: { channel: string; messages: SlackMessage[] }[] = [];
+  for (const channel of channelIds) {
+    const messages: SlackMessage[] = [];
+    let cursor = "";
+    do {
+      const params = new URLSearchParams({ channel, limit: "200" });
+      if (sinceTs) params.set("oldest", sinceTs);
+      if (cursor) params.set("cursor", cursor);
+      const data = await slackGatewayFetch("conversations.history", params.toString());
+      for (const m of (data["messages"] as (SlackMessage & { subtype?: string; bot_id?: string })[] | undefined) ?? []) {
+        if (m.bot_id) continue;
+        if (m.subtype === "channel_join" || m.subtype === "channel_leave") continue;
+        if (!m.text?.trim()) continue;
+        messages.push({ ts: m.ts, text: m.text, user: m.user });
+      }
+      cursor = (data["response_metadata"] as { next_cursor?: string } | undefined)?.next_cursor ?? "";
+    } while (cursor);
+    out.push({ channel, messages });
+  }
+  return out;
+}
 
 export const SLACK_SCOPES = ["channels:read", "channels:history"] as const;
 
