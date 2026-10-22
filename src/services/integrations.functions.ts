@@ -14,7 +14,7 @@ import {
   runSync,
 } from "@/server/integrations/core";
 import { parseCsv } from "@/server/integrations/csv";
-import { listSlackChannels, slackAuthorizeUrl } from "@/server/integrations/slack";
+import { listSlackChannels, listSlackChannelsGateway, slackAuthorizeUrl } from "@/server/integrations/slack";
 import { hashAuthor, maskPii } from "@/server/integrations/pii";
 import type { IntegrationConnection, IntegrationSync } from "@/types/integrations";
 
