@@ -2,6 +2,7 @@ import { integrationCatalog } from "@/mocks/integrations";
 import { validateIntegrationChannels, syncFrequencies } from "@/lib/integrations";
 import type { IntegrationConnection, SyncFrequency } from "@/types/integrations";
 import { delay, mockResponse } from "./http";
+import { USE_MOCKS } from "./mode";
 import {
   connectTrendyolFn,
   disconnectIntegrationFn,
@@ -17,7 +18,7 @@ import {
  * VITE_USE_MOCKS=false → gerçek backend (sunucu fonksiyonları + veritabanı).
  * Bileşenler yalnızca bu dosyadaki fonksiyonları çağırır; mod burada seçilir.
  */
-export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== "false";
+export { USE_MOCKS };
 
 export function getIntegrationCatalog(): Promise<IntegrationConnection[]> {
   if (!USE_MOCKS) return listIntegrationCatalog();
