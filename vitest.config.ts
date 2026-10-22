@@ -9,6 +9,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    // Testler her zaman mock modda çalışır; gerçek backend çağrıları yapılmaz.
+    env: { VITE_USE_MOCKS: "true" },
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
