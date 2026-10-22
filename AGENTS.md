@@ -21,3 +21,10 @@
 - Dashboard period aggregation and privacy filtering live in its service/helper layer; all widgets share one snapshot timestamp so period comparisons stay coherent.
 - Dashboard reuses `NewEmployeeSheet` unchanged and converts actions through a mock service; task creation is idempotent per action and remains in memory like other mock mutations.
 - The integrations catalog uses its own typed mock service, leaving existing pulse and customer-source flows unchanged; consent and channel allowlists are validated by services before mutations.
+
+## Gerçek backend (Entegrasyonlar)
+- VITE_USE_MOCKS=true mock'u, false gerçek backend'i seçer; dallanma yalnızca src/services altında (mode.ts).
+- Sunucu mantığı src/server/integrations altında; istemci yalnızca src/services/*.functions.ts üzerinden erişir.
+- Entegrasyon secret'ları pgcrypto ile şifreli (INTEGRATION_SECRET_KEY yalnızca sunucuda); integration_secrets tablosuna istemci erişimi yok.
+- Zamanlanmış senkron: /api/public/jobs/sync-integrations (authenticateCronRequest), saatlik yönetilen zamanlayıcı.
+- Analiz: Lovable AI Gateway /v1/responses (openai/gpt-6-astra), metinler önce pii.ts ile maskelenir; <5 kişilik gruplar sunucuda bastırılır.

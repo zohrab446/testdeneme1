@@ -3,8 +3,51 @@ import { dashboardAlerts, dashboardDates, dashboardObservations, dashboardTasks,
 import { buildDashboardMetrics, dashboardBounds, dashboardDepartment, withinDashboardRange } from "@/lib/dashboard";
 import type { DashboardWidgets, DashboardPeriod, DashboardTask, VocSentiment } from "@/types";
 import { delay, mockResponse } from "./http";
+import { USE_MOCKS } from "./mode";
+import { getCompanyInsights } from "./insights.functions";
+
+/** Gerçek mod: raw_items toplulaştırmasından dashboard widget verisi üretir. */
+async function loadWidgetReal<K extends keyof DashboardWidgets>(widget: K, period: DashboardPeriod): Promise<DashboardWidgets[K] | null> {
+  const insights = await getCompanyInsights();
+  const now = Date.now();
+  const from = now - period * 86400000;
+  const inRange = insights.reviews.filter((r) => new Date(r.createdAt).getTime() >= from);
+  const score = (list: typeof inRange) => {
+    const rated = list.filter((r) => r.sentiment);
+    return rated.length ? Math.round(rated.reduce((s, r) => s + (r.sentiment === "pozitif" ? 100 : r.sentiment === "negatif" ? 0 : 50), 0) / rated.length) : 0;
+  };
+  const weekly = insights.weekly.slice(-12);
+  const data: DashboardWidgets = {
+    overview: {
+      metrics: [
+        { id: "happiness", value: score(inRange), delta: 0, series: weekly.map((w) => (w.total ? Math.round((w.pozitif * 100 + w.notr * 50) / w.total) : 0)) },
+        { id: "burnout", value: 100 - score(inRange), delta: 0, series: weekly.map((w) => (w.total ? 100 - Math.round((w.pozitif * 100 + w.notr * 50) / w.total) : 0)) },
+        { id: "customers", value: score(inRange), delta: 0, series: [] },
+        { id: "critical", value: inRange.filter((r) => r.sentiment === "negatif").length, delta: 0, series: [] },
+        { id: "onboarding", value: 0, delta: 0, series: [] },
+        { id: "actions", value: 0, delta: 0, series: [] },
+      ],
+      updatedAt: new Date().toISOString(),
+      critical: inRange.filter((r) => r.sentiment === "negatif").length,
+      pending: 0,
+    },
+    priorities: [],
+    departments: insights.departments.map((d) =>
+      d.suppressed ? { id: d.departmentId, name: "Departman", suppressed: true as const } : { id: d.departmentId, name: "Departman", suppressed: false as const, score: d.score, risk: d.score < 40 ? ("yuksek" as const) : d.score < 65 ? ("orta" as const) : ("dusuk" as const) },
+    ),
+    trend: weekly.map((w) => ({ date: w.weekStart, employee: w.total ? Math.round((w.pozitif * 100 + w.notr * 50) / w.total) : null, customer: w.total ? Math.round((w.pozitif * 100 + w.notr * 50) / w.total) : null })),
+    topics: Object.entries(inRange.reduce<Record<string, number>>((acc, r) => { for (const t of r.topics) acc[t] = (acc[t] ?? 0) + 1; return acc; }, {}))
+      .sort((a, b) => b[1] - a[1]).slice(0, 5)
+      .map(([topic, count]) => ({ topic: topic as never, count, sentiment: "notr" as const })),
+    alerts: [],
+    onboarding: [],
+    dates: [],
+  };
+  return data[widget];
+}
 
 export async function getDashboardWidget<K extends keyof DashboardWidgets>(widget: K, period: DashboardPeriod, demo: boolean): Promise<DashboardWidgets[K] | null> {
+  if (!USE_MOCKS) return loadWidgetReal(widget, period);
   if (!demo) return mockResponse(null, null);
   if (typeof window !== "undefined") {
     const params = new URLSearchParams(window.location.search);

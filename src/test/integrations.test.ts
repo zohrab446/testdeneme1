@@ -36,16 +36,16 @@ describe("Entegrasyon kuralları", () => {
     expect((await run(testIntegrationConnection("google", true, []))).status).toBe("bagli");
   });
   it("yönetimde senkron sıklığını ve kanalları kaydeder", async () => {
-    const source = await run(saveIntegrationSettings("slack", "haftalik", ["satis"]));
+    const source = (await run(saveIntegrationSettings("slack", "haftalik", ["satis"])))!;
     expect(source.frequency).toBe("haftalik"); expect(source.selectedChannels).toEqual(["satis"]);
   });
   it("yalnızca son 10 senkron kaydını tutar", async () => {
-    const source = await run(testIntegrationConnection("slack", true, ["genel"]));
+    const source = (await run(testIntegrationConnection("slack", true, ["genel"])))!;
     expect(source.logs).toHaveLength(10); expect(source.logs[0]?.success).toBe(true);
   });
   it("bağlantı kesilince açıklanan süreye silinme tarihi koyar", async () => {
     vi.setSystemTime(new Date("2026-10-21T10:00:00Z"));
-    const source = await run(disconnectIntegration("slack"));
+    const source = (await run(disconnectIntegration("slack")))!;
     expect(source.status).toBe("bagli_degil"); expect(source.consent).toBe(false);
     expect(source.selectedChannels).toEqual([]);
     expect(new Date(source.deleteAt ?? "").getTime() - Date.now()).toBe(source.deletionDays * 86400000);

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AksiyonlarRouteImport } from './routes/aksiyonlar'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AyarlarRouteImport } from './routes/ayarlar'
 import { Route as CalisanNabziRouteImport } from './routes/calisan-nabzi'
 import { Route as EntegrasyonlarRouteImport } from './routes/entegrasyonlar'
@@ -19,6 +20,8 @@ import { Route as AyarlarSekmeRouteImport } from './routes/ayarlar_.$sekme'
 import { Route as KarsilamaTokenRouteImport } from './routes/karsilama.$token'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding.index'
 import { Route as OnboardingIdRouteImport } from './routes/onboarding.$id'
+import { Route as ApiPublicJobsSyncIntegrationsRouteImport } from './routes/api/public/jobs/sync-integrations'
+import { Route as ApiPublicIntegrationsSlackCallbackRouteImport } from './routes/api/public/integrations/slack/callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const AksiyonlarRoute = AksiyonlarRouteImport.update({
   id: '/aksiyonlar',
   path: '/aksiyonlar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AyarlarRoute = AyarlarRouteImport.update({
@@ -70,10 +78,23 @@ const OnboardingIdRoute = OnboardingIdRouteImport.update({
   path: '/onboarding/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJobsSyncIntegrationsRoute =
+  ApiPublicJobsSyncIntegrationsRouteImport.update({
+    id: '/api/public/jobs/sync-integrations',
+    path: '/api/public/jobs/sync-integrations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicIntegrationsSlackCallbackRoute =
+  ApiPublicIntegrationsSlackCallbackRouteImport.update({
+    id: '/api/public/integrations/slack/callback',
+    path: '/api/public/integrations/slack/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aksiyonlar': typeof AksiyonlarRoute
+  '/auth': typeof AuthRoute
   '/ayarlar': typeof AyarlarRoute
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
@@ -82,10 +103,13 @@ export interface FileRoutesByFullPath {
   '/karsilama/$token': typeof KarsilamaTokenRoute
   '/onboarding/$id': typeof OnboardingIdRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/api/public/jobs/sync-integrations': typeof ApiPublicJobsSyncIntegrationsRoute
+  '/api/public/integrations/slack/callback': typeof ApiPublicIntegrationsSlackCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aksiyonlar': typeof AksiyonlarRoute
+  '/auth': typeof AuthRoute
   '/ayarlar': typeof AyarlarRoute
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
@@ -94,11 +118,14 @@ export interface FileRoutesByTo {
   '/karsilama/$token': typeof KarsilamaTokenRoute
   '/onboarding/$id': typeof OnboardingIdRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/api/public/jobs/sync-integrations': typeof ApiPublicJobsSyncIntegrationsRoute
+  '/api/public/integrations/slack/callback': typeof ApiPublicIntegrationsSlackCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aksiyonlar': typeof AksiyonlarRoute
+  '/auth': typeof AuthRoute
   '/ayarlar': typeof AyarlarRoute
   '/calisan-nabzi': typeof CalisanNabziRoute
   '/entegrasyonlar': typeof EntegrasyonlarRoute
@@ -107,12 +134,15 @@ export interface FileRoutesById {
   '/karsilama/$token': typeof KarsilamaTokenRoute
   '/onboarding/$id': typeof OnboardingIdRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/api/public/jobs/sync-integrations': typeof ApiPublicJobsSyncIntegrationsRoute
+  '/api/public/integrations/slack/callback': typeof ApiPublicIntegrationsSlackCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/aksiyonlar'
+    | '/auth'
     | '/ayarlar'
     | '/calisan-nabzi'
     | '/entegrasyonlar'
@@ -121,10 +151,13 @@ export interface FileRouteTypes {
     | '/karsilama/$token'
     | '/onboarding/$id'
     | '/onboarding/'
+    | '/api/public/jobs/sync-integrations'
+    | '/api/public/integrations/slack/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/aksiyonlar'
+    | '/auth'
     | '/ayarlar'
     | '/calisan-nabzi'
     | '/entegrasyonlar'
@@ -133,10 +166,13 @@ export interface FileRouteTypes {
     | '/karsilama/$token'
     | '/onboarding/$id'
     | '/onboarding'
+    | '/api/public/jobs/sync-integrations'
+    | '/api/public/integrations/slack/callback'
   id:
     | '__root__'
     | '/'
     | '/aksiyonlar'
+    | '/auth'
     | '/ayarlar'
     | '/calisan-nabzi'
     | '/entegrasyonlar'
@@ -145,11 +181,14 @@ export interface FileRouteTypes {
     | '/karsilama/$token'
     | '/onboarding/$id'
     | '/onboarding/'
+    | '/api/public/jobs/sync-integrations'
+    | '/api/public/integrations/slack/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AksiyonlarRoute: typeof AksiyonlarRoute
+  AuthRoute: typeof AuthRoute
   AyarlarRoute: typeof AyarlarRoute
   CalisanNabziRoute: typeof CalisanNabziRoute
   EntegrasyonlarRoute: typeof EntegrasyonlarRoute
@@ -158,6 +197,8 @@ export interface RootRouteChildren {
   KarsilamaTokenRoute: typeof KarsilamaTokenRoute
   OnboardingIdRoute: typeof OnboardingIdRoute
   OnboardingIndexRoute: typeof OnboardingIndexRoute
+  ApiPublicJobsSyncIntegrationsRoute: typeof ApiPublicJobsSyncIntegrationsRoute
+  ApiPublicIntegrationsSlackCallbackRoute: typeof ApiPublicIntegrationsSlackCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -174,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/aksiyonlar'
       fullPath: '/aksiyonlar'
       preLoaderRoute: typeof AksiyonlarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ayarlar': {
@@ -232,12 +280,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/sync-integrations': {
+      id: '/api/public/jobs/sync-integrations'
+      path: '/api/public/jobs/sync-integrations'
+      fullPath: '/api/public/jobs/sync-integrations'
+      preLoaderRoute: typeof ApiPublicJobsSyncIntegrationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/integrations/slack/callback': {
+      id: '/api/public/integrations/slack/callback'
+      path: '/api/public/integrations/slack/callback'
+      fullPath: '/api/public/integrations/slack/callback'
+      preLoaderRoute: typeof ApiPublicIntegrationsSlackCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AksiyonlarRoute: AksiyonlarRoute,
+  AuthRoute: AuthRoute,
   AyarlarRoute: AyarlarRoute,
   CalisanNabziRoute: CalisanNabziRoute,
   EntegrasyonlarRoute: EntegrasyonlarRoute,
@@ -246,6 +309,9 @@ const rootRouteChildren: RootRouteChildren = {
   KarsilamaTokenRoute: KarsilamaTokenRoute,
   OnboardingIdRoute: OnboardingIdRoute,
   OnboardingIndexRoute: OnboardingIndexRoute,
+  ApiPublicJobsSyncIntegrationsRoute: ApiPublicJobsSyncIntegrationsRoute,
+  ApiPublicIntegrationsSlackCallbackRoute:
+    ApiPublicIntegrationsSlackCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
