@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, CircleCheck, Loader2, PlugZap, RotateCw, ShieldCheck, Upload } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   connectTrendyolIntegration,
   importCsvIntegration,
+  listSlackWorkspaceChannels,
   startSlackConnection,
   testIntegrationConnection,
   USE_MOCKS,
